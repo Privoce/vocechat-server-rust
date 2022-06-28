@@ -1,0 +1,13 @@
+[package]
+name = "rc-token"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = { version = "0.4.19", features = ["serde"] }
+hmac = "0.11.0"
+jwt = "0.15.0"
+serde = { version = "1.0.132", features = ["derive"] }
+sha2 = "0.9.0"
+textnonce = "1.0.0"
+thiserror = "1.0.30"
