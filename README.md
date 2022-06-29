@@ -365,3 +365,7 @@ view: http://localhost:3000/
 ### Contact Us
 Github: [https://github.com/privoce/vocechat-server](https://github.com/privoce/vocechat-server)  
 Email: [han@privoce.com](han@privoce.com)
+
+
+https://github.com/Privoce/vocechat-web/releases/download/v0.3.0/web.vocechat.md5
+https://github.com/Privoce/vocechat-web/releases/v0.3.0/download/web.vocechat.md5

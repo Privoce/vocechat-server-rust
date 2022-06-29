@@ -18,6 +18,8 @@ use poem::{
     http::StatusCode,
     Request,
 };
+
+
 use poem_openapi::Enum;
 use rc_magic_link::MagicLinkToken;
 use rc_msgdb::MsgDb;
