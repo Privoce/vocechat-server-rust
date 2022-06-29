@@ -17,7 +17,7 @@ Schematic & Commands:
 docker run -d --restart=always \
   -p 3000:3000 \
   --name vocechat-server \
-  Privoce/vocechat-server:latest
+  privoce/vocechat-server:latest
 ```
 Visit: http://localhost:3000/
 
