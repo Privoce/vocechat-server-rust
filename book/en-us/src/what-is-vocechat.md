@@ -1,4 +1,4 @@
-# RustChat Brief
+# VoceChat Brief
 `Vocechat` is a secure chat software that supports independent deployment.
 The data is completely controlled by the user.
 It supports the whole process of encrypted transmission and can be burned immediately after reading.
