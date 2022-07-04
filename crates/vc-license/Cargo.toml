@@ -1,5 +1,5 @@
 [package]
-name = "voce-license"
+name = "vc-license"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,8 @@ edition = "2021"
 [dependencies]
 chrono={version="0.4.19"}
 uuid = {version="1.1.2", features=["v4"]}
-rsa = {version="0.6.1"}
+rsa = {version="0.6.1", features=["pem"]}
+pkcs1="0.3.3"
 rand="0.8.5"
 sha2="0.9.9"
 digest="0.8.1"

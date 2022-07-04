@@ -1,13 +1,15 @@
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
+use pkcs1::EncodeRsaPrivateKey;
 use rsa::{PublicKey, RsaPrivateKey, RsaPublicKey, PaddingScheme};
+use rsa::pkcs1::{EncodeRsaPublicKey, LineEnding};
 
 #[derive(Debug)]
 pub struct License {
-    domain: String,
-    created_at: DateTime<Utc>,
-    expired_at: DateTime<Utc>,
-    sign: Vec<u8>,
+    pub domain: String,
+    pub created_at: DateTime<Utc>,
+    pub expired_at: DateTime<Utc>,
+    pub sign: Vec<u8>,
 }
 
 impl License {
@@ -57,6 +59,15 @@ impl LicenseGenerator {
         }
     }
 
+    pub fn new_from_pem(private_key_pem: &str, public_key_pem: &str) -> Result<Self> {
+        let private_key = pkcs1::DecodeRsaPrivateKey::from_pkcs1_pem(private_key_pem)?;
+        let public_key = pkcs1::DecodeRsaPublicKey::from_pkcs1_pem(public_key_pem)?;
+        Ok(LicenseGenerator {
+            private_key,
+            public_key,
+        })
+    }
+
     pub fn gen(&self, domain: &str, expired_at: DateTime<Utc>) -> License {
         let created_at = Utc::now();
         let mut license = License {
@@ -85,12 +96,22 @@ impl LicenseGenerator {
 
 }
 
-fn gen_rsa_pair() -> (RsaPrivateKey, RsaPublicKey) {
+pub fn gen_rsa_pair() -> (RsaPrivateKey, RsaPublicKey) {
     let mut rng = rand::thread_rng();
     let bits = 2048;
     let private_key = RsaPrivateKey::new(&mut rng, bits).expect("failed to generate a key");
     let public_key = RsaPublicKey::from(&private_key);
     (private_key, public_key)
+}
+
+pub fn gen_rsa_pem_pair() -> Result<(String, String)> {
+    let mut rng = rand::thread_rng();
+    let bits = 2048;
+    let private_key = RsaPrivateKey::new(&mut rng, bits).expect("failed to generate a key");
+    let a = private_key.to_pkcs1_pem(LineEnding::CRLF)?.to_string();
+    let public_key = RsaPublicKey::from(&private_key);
+    let b = public_key.to_pkcs1_pem(LineEnding::CRLF)?;
+    Ok((a, b))
 }
 
 fn rsa_sign(digest_in: &[u8], private_key: &RsaPrivateKey) -> Vec<u8> {
