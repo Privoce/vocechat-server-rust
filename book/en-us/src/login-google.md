@@ -18,6 +18,8 @@ For **Authorized domains**, if your **vocechat** is deployed on your domain, ple
 
 For example: if your **vocechat** can be accessed via ```https://chat.domain.com/```, fill it with ```domain.com```. 
 
+If you are using ```localhost``` as your host server, please fill it with both ```http://localhost``` and ```http://localhost:3000```.
+
 ![img.jpg](image/login-google-3.jpg)
 
 ### 4. Create `credentials`
