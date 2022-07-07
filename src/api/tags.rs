@@ -20,6 +20,9 @@ pub enum ApiTags {
     /// Favorite archive operations
     Favorite,
 
+    /// License operations
+    License,
+
     /// User management operations
     AdminUser,
 

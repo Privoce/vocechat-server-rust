@@ -9,6 +9,7 @@ rc-msgdb = { path = "./crates/msgdb" }
 rc-token = { path = "./crates/token" }
 rc-fcm = { path = "./crates/fcm" }
 rc-magic-link = { path = "./crates/magic-link" }
+vc-license = { path = "./crates/vc-license" }
 agora-token = { path = "./crates/agora-token" }
 open-graph = { path = "./crates/open-graph", features = ["poem_openapi"] }
 
@@ -92,12 +93,14 @@ walkdir = "2.3.2"
 base64 = "0.13.0"
 zip = { version = "0.6.0", default-features = false, features = ["deflate"] }
 mime_guess = "2.0.4"
+url="1.7.2"
+once_cell="1.13.0"
 
 [target.'cfg(not(windows))'.dependencies]
 daemonize = "0.4.1"
 
 [workspace]
-members = ["crates/msgdb", "crates/token", "crates/fcm", "crates/open-graph"]
+members = ["crates/msgdb", "crates/token", "crates/fcm", "crates/open-graph", "crates/vc-license"]
 
 [dev-dependencies]
 reqwest = { version = "0.11.8", default-features = false, features = [

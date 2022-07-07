@@ -69,6 +69,7 @@ impl TestServer {
         let state = crate::server::create_state(tempdir.path(), Arc::new(cfg))
             .await
             .unwrap();
+        crate::license::load_license(&state).await.unwrap();
         state
             .set_dynamic_config(DynamicConfigEntry {
                 enabled: true,

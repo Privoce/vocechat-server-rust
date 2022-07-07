@@ -70,6 +70,7 @@ impl MagicLinkToken {
         if s.as_ref().is_empty() {
             return None;
         }
+        // ya29.a0ARrdaM-5RaNLVVbJQSCYlekpYmPqhUXpG4THaOOYA0kUJ8jUd_rLFEgRappLi9fdmFpvdD7keGos2jzcnl0Vivh4C3HDNbOJpqCtwEQvH8vIYGUayAeMNMKGowkAhH0zCCprUGNBdQaZ65EW8Gf3kKcPc2GH
         let data = hex::decode(s.as_ref()).ok()?;
         assert!(data.len() >= 32);
         let mut mac = hmac::Hmac::<Sha256>::new_from_slice(server_key.as_bytes()).unwrap();

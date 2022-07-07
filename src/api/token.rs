@@ -577,13 +577,14 @@ impl ApiToken {
         &self,
         state: Data<&State>,
         req: Json<LoginRequest>,
+        request: &Request,
     ) -> Result<LoginApiResponse> {
         // let smtp_on = state
         //     .load_dynamic_config::<crate::api::SmtpConfig>()
         //     .await?
         //     .enabled;
 
-        dbg!(&req);
+        crate::license::check_license_wrap!(&state, request);
 
         let login_cfg = state
             .get_dynamic_config_instance::<LoginConfig>()

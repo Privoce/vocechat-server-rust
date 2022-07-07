@@ -20,6 +20,7 @@ mod tags;
 mod token;
 mod user;
 mod user_log_action;
+mod license;
 
 pub use admin_agora::AgoraConfig;
 pub use admin_fcm::FcmConfig;
@@ -57,6 +58,7 @@ pub fn create_api_service() -> OpenApiService<impl OpenApi, ()> {
             resource::ApiResource,
             message_api::ApiMessage,
             favorite::ApiFavorite,
+            license::ApiLicense,
             admin_system::ApiAdminSystem,
             admin_agora::ApiAdminAgora,
             admin_fcm::ApiAdminFirebase,

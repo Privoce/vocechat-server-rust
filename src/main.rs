@@ -8,6 +8,7 @@ mod server;
 mod state;
 #[cfg(test)]
 mod test_harness;
+mod license;
 
 use std::{
     fs::File,
@@ -242,6 +243,8 @@ fn main() {
             },
             None => None,
         };
+
+        crate::license::load_license(&state).await.unwrap();
 
         let app = match &config.network.tls {
             Some(TlsConfig::AcmeHttp01 { .. }) => RouteScheme::new()

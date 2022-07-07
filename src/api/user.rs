@@ -597,7 +597,8 @@ impl ApiUser {
         email: Query<Email>,
         req: &Request,
     ) -> Result<PlainText<String>> {
-        // check login magic link on/off
+
+        crate::license::check_license_wrap!(&state, req);
 
         let login_config = state
             .get_dynamic_config_instance::<LoginConfig>()
