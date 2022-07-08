@@ -103,7 +103,7 @@ impl ApiAdminUser {
                 email: &req.email,
                 password: &req.password,
             },
-            false
+            false,
         )
         .gender(req.gender)
         .set_admin(req.is_admin)

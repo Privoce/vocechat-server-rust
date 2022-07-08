@@ -58,7 +58,7 @@ const fn default_refresh_token_expiry_seconds() -> i64 {
 }
 
 const fn default_magic_token_expiry_seconds() -> i64 {
-     60 * 15
+    60 * 15
 }
 
 const fn default_upload_avatar_limit() -> usize {

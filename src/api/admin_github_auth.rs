@@ -62,11 +62,10 @@ impl ApiAdminGithubAuth {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
+    use crate::test_harness::TestServer;
     use serde_json::json;
-    use crate::{test_harness::TestServer};
 
     #[tokio::test]
     async fn set_get_github_oauth() {
@@ -95,10 +94,6 @@ mod tests {
         //dbg!(body);
 
         let json = resp.json().await;
-        json.value()
-            .object()
-            .get("client_id")
-            .assert_string("test");
+        json.value().object().get("client_id").assert_string("test");
     }
-
 }

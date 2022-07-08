@@ -388,21 +388,21 @@ impl ApiUser {
                 uid,
                 // Ok::<_, poem::Error>(RegisterUserResponse::Ok(Json(user.api_user_info(uid)))),
                 Ok::<_, poem::Error>({
-                     drop(user);
-                     if let Ok(super::token::LoginApiResponse::Ok(Json(login_resp))) =
-                     super::token::do_login(
-                         &state,
-                         uid,
-                         &req.0.device,
-                         req.0.device_token.as_deref(),
-                     )
-                         .await
-                     {
-                         RegisterUserResponse::Ok(Json(login_resp))
-                     } else {
-                         RegisterUserResponse::OkButLoginFailed
-                     }
-                 })
+                    drop(user);
+                    if let Ok(super::token::LoginApiResponse::Ok(Json(login_resp))) =
+                        super::token::do_login(
+                            &state,
+                            uid,
+                            &req.0.device,
+                            req.0.device_token.as_deref(),
+                        )
+                        .await
+                    {
+                        RegisterUserResponse::Ok(Json(login_resp))
+                    } else {
+                        RegisterUserResponse::OkButLoginFailed
+                    }
+                }),
             ),
             Err(CreateUserError::NameConflict) => {
                 return Ok(RegisterUserResponse::Conflict(Json(UserConflict {
@@ -476,8 +476,9 @@ impl ApiUser {
             .enabled;
 
         let (new_magic_token, gid) = if smtp_on {
-            let mt = MagicLinkToken::parse(&key_config.server_key, &post.magic_token)
-                .ok_or_else(|| Error::from_status(StatusCode::from_u16(1000).unwrap_or_default()))?;
+            let mt = MagicLinkToken::parse(&key_config.server_key, &post.magic_token).ok_or_else(
+                || Error::from_status(StatusCode::from_u16(1000).unwrap_or_default()),
+            )?;
 
             let (gid, code, expired_at) = match mt {
                 MagicLinkToken::Register {
@@ -500,28 +501,34 @@ impl ApiUser {
                 chrono::DateTime::from_utc(naive, chrono::Utc)
             };
 
-            (MagicLinkToken::gen_reg_magic_token(
-                &code,
-                &state.key_config.read().await.server_key,
-                expired_at,
-                true,
+            (
+                MagicLinkToken::gen_reg_magic_token(
+                    &code,
+                    &state.key_config.read().await.server_key,
+                    expired_at,
+                    true,
+                    gid,
+                    Some(post.email.clone()),
+                    Some(post.password.clone()),
+                ),
                 gid,
-                Some(post.email.clone()),
-                Some(post.password.clone()),
-            ), gid)
+            )
         } else {
             let code = rc_magic_link::gen_code();
             let expired_at = chrono::Utc::now() + chrono::Duration::seconds(86400);
             let gid = None;
-            (MagicLinkToken::gen_reg_magic_token(
-                &code,
-                &state.key_config.read().await.server_key,
-                expired_at,
-                true,
+            (
+                MagicLinkToken::gen_reg_magic_token(
+                    &code,
+                    &state.key_config.read().await.server_key,
+                    expired_at,
+                    true,
+                    gid,
+                    Some(post.email.clone()),
+                    Some(post.password.clone()),
+                ),
                 gid,
-                Some(post.email.clone()),
-                Some(post.password.clone()),
-            ), gid)
+            )
         };
 
         if smtp_on {
@@ -597,7 +604,6 @@ impl ApiUser {
         email: Query<Email>,
         req: &Request,
     ) -> Result<PlainText<String>> {
-
         crate::license::check_license_wrap!(&state, req);
 
         let login_config = state
@@ -3083,9 +3089,7 @@ mod tests {
     async fn received_mute_changed() {
         let server = TestServer::new().await;
         let admin_token_ios = server.login_with_device("admin@voce.chat", "ios").await;
-        let admin_token_android = server
-            .login_with_device("admin@voce.chat", "android")
-            .await;
+        let admin_token_android = server.login_with_device("admin@voce.chat", "android").await;
         let mut events_admin_ios = server
             .subscribe_events(&admin_token_ios, Some(&["user_settings_changed"]))
             .await;
@@ -3267,9 +3271,7 @@ mod tests {
         let uid2 = server.create_user(&admin_token, "user2@voce.chat").await;
         let token1 = server.login("user1@voce.chat").await;
         let token2_ios = server.login_with_device("user2@voce.chat", "ios").await;
-        let token2_android = server
-            .login_with_device("user2@voce.chat", "android")
-            .await;
+        let token2_android = server.login_with_device("user2@voce.chat", "android").await;
 
         let mut events1 = server
             .subscribe_events(&token1, Some(&["users_state", "users_state_changed"]))
@@ -3734,7 +3736,15 @@ mod tests {
 
         //resp.assert_text("xxx").await;
         let json = resp.json().await;
-        assert_eq!(email1, json.value().object().get("user").object().get("email").string());
+        assert_eq!(
+            email1,
+            json.value()
+                .object()
+                .get("user")
+                .object()
+                .get("email")
+                .string()
+        );
     }
 
     #[tokio::test]

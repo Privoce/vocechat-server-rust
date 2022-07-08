@@ -96,7 +96,7 @@ impl TestServer {
                         email: "admin@voce.chat",
                         password: "123456",
                     },
-                    false
+                    false,
                 )
                 .gender(1)
                 .set_admin(true),

@@ -1,11 +1,11 @@
-use std::ops::{Deref};
-use poem::Request;
 use crate::state::State;
 use anyhow::Result;
 use chrono::Utc;
-use vc_license::License;
 use once_cell::sync::Lazy;
+use poem::Request;
+use std::ops::Deref;
 use tokio::sync::Mutex;
+use vc_license::License;
 
 pub static VOCE_LICENSE_DEFAULT: &str = "333RgyjbHG5BoTXJaHDwAwcqZD1FZo24LKyByKvM4EgRGoyZFfrDhVgNVu9PFSaUoT6funBzzHWxNJRTcXfUEhx16WoSng9hukM51nmsA6EF5bNA76UDdjxyTRqp3EdpcWZhs58oiuwun1CF5HMYGT54pD9xb35u3Aq15iHqCkWBcoU4DHJRtg9HPVqGskbmwSAYbpfgWZE9NQMxt4RZxB8arik1CCUyAxpW8tKPLdt1JzeJi1KcWXn8Vmm8Nzb7hFfpjVb8yeAGc2QXyGLkGq92BgRdA6iPpc4HZQkfDFZ69xP2YFiH5fZbmAFAX2UGYKPkFQU5jQodVTtqZXxexczPCNtZQY2K5cdLcnQEoVjSKQ3cp2m15Twyus9JFbS3dm22aeX3ZBu2unXoV6mDwDndTJ3tBU6FxVyg3zckAHj5Kh2yfAcVdqnaU3JQAZcFsQVHw319qbUywm2PenD1jnSBAtuy6N6oqzXj9n8yQFrqJLFKCg8VaVhke9fUCKGYey4iVgQsHLHK6CMcjYMGWfB3tatPn44wGNpegdm9i4vEo3729HQBu6Ba4MCrNkkX8o244WehVHSaage6UVdMQMd8uh3QBEJJQTd3Vchz9Z4W4389iW5iA2pyzXTGmKEh8NiqUQZJgoE3HZysdaHpahxbCs2ihU7M9da5DtJMxjic7fKNtTinSomQ9E8TS5mBBGJsSYsAb94kpRrT9wxmH5Am81WWaY3UWR68Kxb4DHHtU7MA1ptJuQNCuBMBGeG7tj5f3TmsxB7FR4Mh4Fz";
 
@@ -19,12 +19,12 @@ dnwtOymXGQpaS/Vfo0q1kGzZoXsCx3v7BQIDAQAB
 -----END RSA PUBLIC KEY-----"#;
 
 // pub static mut g_license: Lazy<License> = Lazy::new(||License::default());
-pub static G_LICENSE: Lazy<Mutex<License>> = Lazy::new(||Mutex::new(License::default()));
+pub static G_LICENSE: Lazy<Mutex<License>> = Lazy::new(|| Mutex::new(License::default()));
 
 pub fn get_referer_domain(req: &Request) -> Option<String> {
     let referer = req.header("Referer").unwrap_or_default();
     let u = url::Url::parse(referer).ok()?;
-    u.domain().map(|v|v.to_string())
+    u.domain().map(|v| v.to_string())
 }
 
 pub async fn load_license(state: &State) -> Result<()> {
@@ -65,7 +65,8 @@ pub async fn check_license(state: &State, req: &Request) -> Result<()> {
     if cfg!(test) {
         return Ok(());
     }
-    let domain = get_referer_domain(req).ok_or_else(||anyhow::anyhow!("License error: Referer is empty."))?;
+    let domain = get_referer_domain(req)
+        .ok_or_else(|| anyhow::anyhow!("License error: Referer is empty."))?;
     let license_guard = G_LICENSE.lock().await;
     let license = license_guard.deref();
     if license.domain.as_str() == "localhost" {
@@ -95,4 +96,3 @@ macro_rules! check_license_wrap {
     }
 }
 pub(crate) use check_license_wrap;
-

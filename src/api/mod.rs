@@ -2,8 +2,8 @@ use poem_openapi::{OpenApi, OpenApiService};
 
 mod admin_agora;
 mod admin_fcm;
-mod admin_google_auth;
 mod admin_github_auth;
+mod admin_google_auth;
 mod admin_login;
 mod admin_smtp;
 mod admin_system;
@@ -13,6 +13,7 @@ mod datetime;
 mod favorite;
 mod group;
 mod langid;
+mod license;
 mod message;
 mod message_api;
 mod resource;
@@ -20,7 +21,6 @@ mod tags;
 mod token;
 mod user;
 mod user_log_action;
-mod license;
 
 pub use admin_agora::AgoraConfig;
 pub use admin_fcm::FcmConfig;

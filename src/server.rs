@@ -131,7 +131,7 @@ pub async fn create_state(config_path: &Path, config: Arc<Config>) -> Result<Sta
                 email: &user.email,
                 password: &user.password,
             },
-            false
+            false,
         )
         .gender(user.gender)
         .set_admin(user.is_admin)

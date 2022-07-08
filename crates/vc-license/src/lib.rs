@@ -1,8 +1,8 @@
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use pkcs1::EncodeRsaPrivateKey;
-use rsa::{PublicKey, RsaPrivateKey, RsaPublicKey, PaddingScheme};
 use rsa::pkcs1::{EncodeRsaPublicKey, LineEnding};
+use rsa::{PaddingScheme, PublicKey, RsaPrivateKey, RsaPublicKey};
 
 #[derive(Debug)]
 pub struct License {
@@ -20,7 +20,7 @@ impl Default for License {
             user_limit: 0,
             created_at: chrono::MIN_DATETIME,
             expired_at: chrono::MIN_DATETIME,
-            sign: vec![]
+            sign: vec![],
         }
     }
 }
@@ -32,7 +32,14 @@ impl License {
 
     #[allow(clippy::inherent_to_string)]
     pub fn to_string(&self) -> String {
-        let data = format!("{},{},{},{},{}", self.domain, self.user_limit, self.created_at.to_rfc3339(), self.expired_at.to_rfc3339(), hex::encode(&self.sign));
+        let data = format!(
+            "{},{},{},{},{}",
+            self.domain,
+            self.user_limit,
+            self.created_at.to_rfc3339(),
+            self.expired_at.to_rfc3339(),
+            hex::encode(&self.sign)
+        );
         bs58::encode(data.as_bytes()).into_string()
     }
 
@@ -111,7 +118,6 @@ impl LicenseGenerator {
         }
         Ok(())
     }
-
 }
 
 pub fn gen_rsa_pair() -> (RsaPrivateKey, RsaPublicKey) {
@@ -156,8 +162,8 @@ pub fn rsa_check_license(license: &License, public_key_pem: &str) -> Result<()> 
 
 #[cfg(test)]
 mod test {
-    use std::ops::Add;
     use super::*;
+    use std::ops::Add;
 
     #[test]
     fn test_license() {
@@ -226,8 +232,10 @@ dnwtOymXGQpaS/Vfo0q1kGzZoXsCx3v7BQIDAQAB
 
         let licensegen = LicenseGenerator::new_from_pem(private_key_pem, public_key_pem).unwrap();
 
-        let expired_at = chrono::NaiveDate::parse_from_str("2025-01-01", "%Y-%m-%d").expect("Date format error: %Y-%m-%d, just like: 2024-02-01");
-        let expired_at = chrono::NaiveDateTime::new(expired_at, chrono::NaiveTime::from_hms(0, 0, 0));
+        let expired_at = chrono::NaiveDate::parse_from_str("2025-01-01", "%Y-%m-%d")
+            .expect("Date format error: %Y-%m-%d, just like: 2024-02-01");
+        let expired_at =
+            chrono::NaiveDateTime::new(expired_at, chrono::NaiveTime::from_hms(0, 0, 0));
         let expired_at = chrono::DateTime::<Utc>::from_utc(expired_at, Utc);
         let license = licensegen.gen("www.domain.com", expired_at, 20);
 
@@ -238,6 +246,4 @@ dnwtOymXGQpaS/Vfo0q1kGzZoXsCx3v7BQIDAQAB
         let license = License::from_string(license_bs58).unwrap();
         // dbg!(license.domain);
     }
-
-
 }

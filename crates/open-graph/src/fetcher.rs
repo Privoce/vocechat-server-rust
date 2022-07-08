@@ -17,8 +17,8 @@ use reqwest;
 use crate::{error::Error, Audio, Image, Object, Video};
 
 fn gz_decode(data: &[u8]) -> Result<String, Error> {
-    use std::io::prelude::*;
     use flate2::read::GzDecoder;
+    use std::io::prelude::*;
     let mut d = GzDecoder::new(data);
     let mut s = String::new();
     d.read_to_string(&mut s)?;
@@ -29,7 +29,7 @@ use regex::Regex;
 fn fetch_url_from_meta(text: &str) -> Option<String> {
     let re = Regex::new(r#"<meta .*?content=".*?url=(.*?)""#).unwrap();
     if let Some(cap) = re.captures(text) {
-        return cap.get(1).map(|v|v.as_str().to_string());
+        return cap.get(1).map(|v| v.as_str().to_string());
     }
     None
 }
@@ -56,7 +56,9 @@ pub async fn fetch(url: &str, header_map: Option<HeaderMap>, deep: u8) -> Result
         return Err(Error::Unexpected);
     }
     let body = if body[0] == 0x1f && body[1] == 0x8b {
-        gz_decode(body.as_bytes()).unwrap_or_default().to_lowercase()
+        gz_decode(body.as_bytes())
+            .unwrap_or_default()
+            .to_lowercase()
     } else {
         String::from_utf8(body.to_vec()).unwrap_or_default()
     };

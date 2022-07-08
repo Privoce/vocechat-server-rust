@@ -7,6 +7,7 @@ use poem_openapi::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::config::NetworkConfig;
 use crate::{
     api::{tags::ApiTags, token::Token, SmtpConfig, UserInfo},
     create_user::{CreateUser, CreateUserBy},
@@ -14,7 +15,6 @@ use crate::{
     state::{send_mail, DynamicConfig, DynamicConfigEntry},
     State,
 };
-use crate::config::NetworkConfig;
 
 /// Server metrics
 #[derive(Debug, Object)]
@@ -254,7 +254,6 @@ impl ApiAdminSystem {
         token: Token,
         frontend_url: Query<String>,
     ) -> Result<()> {
-
         if !token.is_admin {
             return Err(Error::from_status(StatusCode::FORBIDDEN));
         }
@@ -277,14 +276,17 @@ impl ApiAdminSystem {
         #[cfg(not(test))]
         let config_file_path = state.config_path.as_path();
         #[cfg(test)]
-        let config_file_path = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/config/config.toml"));
+        let config_file_path =
+            std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/config/config.toml"));
         if !config_file_path.exists() {
             return Err(Error::from_string(
                 "config.toml does not exists!",
                 StatusCode::INTERNAL_SERVER_ERROR,
             ));
         }
-        let config_content = tokio::fs::read_to_string(&config_file_path).await.map_err(InternalServerError)?;
+        let config_content = tokio::fs::read_to_string(&config_file_path)
+            .await
+            .map_err(InternalServerError)?;
 
         let re = regex::Regex::new(r#"frontend_url\s*=\s*".*?""#).unwrap();
         let new_content = re.replace(
@@ -293,7 +295,9 @@ impl ApiAdminSystem {
         );
 
         if !new_content.is_empty() {
-            tokio::fs::write(&config_file_path, new_content.as_bytes()).await.map_err(InternalServerError)?;
+            tokio::fs::write(&config_file_path, new_content.as_bytes())
+                .await
+                .map_err(InternalServerError)?;
         }
         Ok(())
     }
@@ -372,5 +376,4 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
     }
-
 }

@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::{
     any::Any,
     borrow::Cow,
@@ -6,7 +7,6 @@ use std::{
     sync::Arc,
     time::{Duration, SystemTime},
 };
-use std::path::PathBuf;
 
 use chrono::{Date, NaiveDate, TimeZone, Utc};
 use futures_util::StreamExt;
@@ -18,7 +18,6 @@ use poem::{
     http::StatusCode,
     Request,
 };
-
 
 use poem_openapi::Enum;
 use rc_magic_link::MagicLinkToken;
@@ -1043,13 +1042,24 @@ pub fn get_frontend_url(state: &State, req: &Request) -> String {
                     });
                 if host.is_empty() {
                     host = if state.config.network.domain.is_empty() {
-                        state.config.network.bind.clone().replace("0.0.0.0", "localhost")
+                        state
+                            .config
+                            .network
+                            .bind
+                            .clone()
+                            .replace("0.0.0.0", "localhost")
                     } else {
                         format!(
                             "{}:{}",
-                            state.config.network.domain.get(0).map(|v|v.to_string()).unwrap_or_default(),
+                            state
+                                .config
+                                .network
+                                .domain
+                                .get(0)
+                                .map(|v| v.to_string())
+                                .unwrap_or_default(),
                             &state.config.network.bind
-                                [state.config.network.bind.find(':').unwrap_or_default()+1..]
+                                [state.config.network.bind.find(':').unwrap_or_default() + 1..]
                         )
                     };
                 }

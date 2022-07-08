@@ -3,12 +3,12 @@
 mod api;
 mod config;
 mod create_user;
+mod license;
 mod self_signed;
 mod server;
 mod state;
 #[cfg(test)]
 mod test_harness;
-mod license;
 
 use std::{
     fs::File,

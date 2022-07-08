@@ -1,17 +1,11 @@
-use chrono::{Utc};
-use poem::{web::Data, Result, Error};
-use poem_openapi::{
-    payload::Json,
-    Object, OpenApi,
-};
-use reqwest::StatusCode;
 use crate::{
-    api::{
-        tags::ApiTags,
-        token::Token,
-    },
+    api::{tags::ApiTags, token::Token},
     State,
 };
+use chrono::Utc;
+use poem::{web::Data, Error, Result};
+use poem_openapi::{payload::Json, Object, OpenApi};
+use reqwest::StatusCode;
 
 #[derive(Debug, Object)]
 struct CheckLicenseRequest {
@@ -52,17 +46,17 @@ impl ApiLicense {
         req: Json<CheckLicenseRequest>,
     ) -> Result<Json<LicenseReply>> {
         let license_bs58 = req.license.clone();
-        let license = vc_license::License::from_string(license_bs58.clone()).map_err(|_err|Error::from_status(StatusCode::BAD_REQUEST))?;
-        let sign_is_ok = vc_license::rsa_check_license_bs58(&license_bs58, VOCE_LICENSE_PUBLIC_KEY_PEM).is_ok();
+        let license = vc_license::License::from_string(license_bs58.clone())
+            .map_err(|_err| Error::from_status(StatusCode::BAD_REQUEST))?;
+        let sign_is_ok =
+            vc_license::rsa_check_license_bs58(&license_bs58, VOCE_LICENSE_PUBLIC_KEY_PEM).is_ok();
 
-        Ok(Json(
-            LicenseReply {
-                domain: license.domain.clone(),
-                created_at: license.created_at,
-                expired_at: license.expired_at,
-                sign: sign_is_ok,
-            }
-        ))
+        Ok(Json(LicenseReply {
+            domain: license.domain.clone(),
+            created_at: license.created_at,
+            expired_at: license.expired_at,
+            sign: sign_is_ok,
+        }))
     }
 
     /// Save the license
@@ -77,13 +71,12 @@ impl ApiLicense {
         license_path.push("license");
         //if !license_path.exists() || (token.is_some() && token.unwrap().is_admin) {
         if !license_path.exists() || token.is_admin {
-            crate::license::update_license(&state, &req.license).await.map_err(|_err|Error::from_status(StatusCode::BAD_REQUEST))?;
+            crate::license::update_license(&state, &req.license)
+                .await
+                .map_err(|_err| Error::from_status(StatusCode::BAD_REQUEST))?;
         }
-        Ok(Json(
-            true
-        ))
+        Ok(Json(true))
     }
-
 }
 
 /*
