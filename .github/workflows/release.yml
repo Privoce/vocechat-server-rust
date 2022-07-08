@@ -19,6 +19,29 @@ jobs:
             rust: stable
             target: x86_64-unknown-linux-musl
             pre_install: sudo apt-get install -y rsync
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+            pre_install: brew install rsync
+          - build: macos-arm
+            os: macos-latest
+            rust: stable
+            target: aarch64-apple-darwin
+            cross: true
+            pre_install: brew install rsync
+          - build: arm-v7
+            os: ubuntu-latest
+            rust: stable
+            target: armv7-unknown-linux-musleabihf
+            cross: true
+            pre_install: sudo apt-get install -y rsync
+          - build: aarch64
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-unknown-linux-musl
+            cross: true
+            pre_install: sudo apt-get install -y rsync
     steps:
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
@@ -56,6 +79,21 @@ jobs:
           docker build -t vocechat-server:${{ github.ref_name}} .
           docker tag vocechat-server:${{ github.ref_name}} privoce/vocechat-server:${{ github.ref_name}}
           docker push privoce/vocechat-server:${{ github.ref_name}}
+      - if: matrix.target == 'aarch64-unknown-linux-musl'
+          run: |
+            docker -v
+            cp -rf target/${{ matrix.target }}/release/vocechat-server build/docker/
+            cd build/docker
+            cp -rf ../../config ./
+            docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
+            # build latest
+            docker build -t vocechat-server:latest-arm64 .
+            docker tag vocechat-server:latest-arm64 privoce/vocechat-server:latest-arm64
+            docker push privoce/vocechat-server:latest-arm64
+            # build version
+            docker build -t vocechat-server:${{ github.ref_name}}-arm64 .
+            docker tag vocechat-server:${{ github.ref_name}}-arm64 privoce/vocechat-server:${{ github.ref_name}}-arm64
+            docker push privoce/vocechat-server:${{ github.ref_name}}-arm64
       - name: rsync to sh.voce.chat
         run: |
           rsync -av vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip root@${{ secrets.VOCECHAT_COM_HOST }}:/home/wwwroot/sh.voce.chat/vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
@@ -97,6 +135,26 @@ jobs:
             os: ubuntu-latest
             rust: stable
             target: x86_64-unknown-linux-musl
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+          - build: macos-arm
+            os: macos-latest
+            rust: stable
+            target: aarch64-apple-darwin
+            cross: true
+            pre_install: brew install rsync
+          - build: arm-v7
+            os: ubuntu-latest
+            rust: stable
+            target: armv7-unknown-linux-musleabihf
+            cross: true
+          - build: aarch64
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-unknown-linux-musl
+            cross: true
     steps:
       - uses: actions/checkout@v2
       - name: Download Artifact
