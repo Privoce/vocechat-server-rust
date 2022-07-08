@@ -13,12 +13,21 @@ Schematic & Commands:
 │         │                  │   3000  │  
 └─────────┘                  └─────────┘  
 ```
+Run on x86_64 platform:
 ```bash
 docker run -d --restart=always \
   -p 3000:3000 \
   --name vocechat-server \
   privoce/vocechat-server:latest
 ```
+Run on arm64 platform ( Apple M1, Aarch64 ):  
+```bash
+docker run -d --restart=always \
+  -p 3000:3000 \
+  --name vocechat-server \
+  privoce/vocechat-server:latest-arm64
+```
+
 Visit: http://localhost:3000/
 
 ## 2. With HTTPS. Runs on 443 port. Auto SSL certificate. <span id=id2></span>
