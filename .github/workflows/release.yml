@@ -80,20 +80,20 @@ jobs:
           docker tag vocechat-server:${{ github.ref_name}} privoce/vocechat-server:${{ github.ref_name}}
           docker push privoce/vocechat-server:${{ github.ref_name}}
       - if: matrix.target == 'aarch64-unknown-linux-musl'
-          run: |
-            docker -v
-            cp -rf target/${{ matrix.target }}/release/vocechat-server build/docker/
-            cd build/docker
-            cp -rf ../../config ./
-            docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
-            # build latest
-            docker build -t vocechat-server:latest-arm64 .
-            docker tag vocechat-server:latest-arm64 privoce/vocechat-server:latest-arm64
-            docker push privoce/vocechat-server:latest-arm64
-            # build version
-            docker build -t vocechat-server:${{ github.ref_name}}-arm64 .
-            docker tag vocechat-server:${{ github.ref_name}}-arm64 privoce/vocechat-server:${{ github.ref_name}}-arm64
-            docker push privoce/vocechat-server:${{ github.ref_name}}-arm64
+        run: |
+          docker -v
+          cp -rf target/${{ matrix.target }}/release/vocechat-server build/docker/
+          cd build/docker
+          cp -rf ../../config ./
+          docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
+          # build latest
+          docker build -t vocechat-server:latest-arm64 .
+          docker tag vocechat-server:latest-arm64 privoce/vocechat-server:latest-arm64
+          docker push privoce/vocechat-server:latest-arm64
+          # build version
+          docker build -t vocechat-server:${{ github.ref_name}}-arm64 .
+          docker tag vocechat-server:${{ github.ref_name}}-arm64 privoce/vocechat-server:${{ github.ref_name}}-arm64
+          docker push privoce/vocechat-server:${{ github.ref_name}}-arm64
       - name: rsync to sh.voce.chat
         run: |
           rsync -av vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip root@${{ secrets.VOCECHAT_COM_HOST }}:/home/wwwroot/sh.voce.chat/vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
