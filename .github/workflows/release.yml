@@ -24,12 +24,12 @@ jobs:
             rust: stable
             target: x86_64-apple-darwin
             pre_install: brew install rsync
-          - build: macos-arm
-            os: macos-latest
-            rust: stable
-            target: aarch64-apple-darwin
-            cross: true
-            pre_install: brew install rsync
+#          - build: macos-arm
+#            os: macos-latest
+#            rust: stable
+#            target: aarch64-apple-darwin
+#            cross: true
+#            pre_install: brew install rsync
           - build: arm-v7
             os: ubuntu-latest
             rust: stable
@@ -139,12 +139,12 @@ jobs:
             os: macos-latest
             rust: stable
             target: x86_64-apple-darwin
-          - build: macos-arm
-            os: macos-latest
-            rust: stable
-            target: aarch64-apple-darwin
-            cross: true
-            pre_install: brew install rsync
+#          - build: macos-arm
+#            os: macos-latest
+#            rust: stable
+#            target: aarch64-apple-darwin
+#            cross: true
+#            pre_install: brew install rsync
           - build: arm-v7
             os: ubuntu-latest
             rust: stable
