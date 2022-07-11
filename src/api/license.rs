@@ -85,11 +85,11 @@ impl ApiLicense {
     async fn get(
         &self,
         state: Data<&State>,
-        //token: Token,
+        token: Token,
     ) -> Result<Json<LicenseReply>> {
-        // if !token.is_admin {
-        //     // return Err(Error::from_status(StatusCode::FORBIDDEN));
-        // }
+        if !token.is_admin {
+            return Err(Error::from_status(StatusCode::FORBIDDEN));
+        }
         let mut license_path = state.config.system.data_dir.clone();
         license_path.push("license");
         let license_bs58 = tokio::fs::read_to_string(license_path).await.map_err(|_err|Error::from_status(StatusCode::BAD_REQUEST))?;
