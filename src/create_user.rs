@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use poem::error::InternalServerError;
+use reqwest::StatusCode;
 use tokio::sync::{RwLockMappedWriteGuard, RwLockWriteGuard};
 
 use crate::{
@@ -142,6 +143,13 @@ impl State {
         let password = create_user.create_by.password();
         let language = create_user.language.cloned().unwrap_or_default();
         let mut cache = self.cache.write().await;
+
+        // check license
+        {
+            if cache.users.len() >= crate::license::G_LICENSE.lock().await.user_limit as usize {
+                return Err(CreateUserError::PoemError(poem::Error::from_string("License error: Users reached limit.", StatusCode::UNAVAILABLE_FOR_LEGAL_REASONS)));
+            }
+        }
 
         if !cache.check_name_conflict(create_user.name) {
             return Err(CreateUserError::NameConflict);

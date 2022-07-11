@@ -7,6 +7,7 @@ PWD=`pwd`
 WORKDIR=""
 
 cd $WORKDIR
+mkdir data/wwwroot
 case "$1" in
   start)
     echo -n "Starting vocechat-server:"

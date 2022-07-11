@@ -1,7 +1,7 @@
 #!/bin/sh
 # auto-check version requires repo to be public
 # VOCECHAT_SERVER_VERION=`curl -s https://github.com/Privoce/vocechat-server/releases/latest | sed "s/.*tag\/\(.*\)\".*/\1/ig"`
-VOCECHAT_SERVER_VERION="v0.3.0"
+VOCECHAT_SERVER_VERION="v0.3.1"
 ARCH=`uname -m`
 OS=`uname`
 PLATFORM="x86_64-unknown-linux-musl"
@@ -12,7 +12,7 @@ HTTPS_ON=""
 #PWD=`pwd`
 
 echo "  ┌────────────────────────────────────────────────────────────────┐ "
-echo "  │              vocechat-server $VOCECHAT_SERVER_VERION installation guide           │ "
+echo "  │              vocechat-server $VOCECHAT_SERVER_VERION installation guide         │ "
 echo "  └────────────────────────────────────────────────────────────────┘ "
 
 x_read() {
@@ -193,15 +193,18 @@ echo -e "Detected platform: \033[31m$PLATFORM\033[0m."
 
 BIN_NAME="vocechat-server-$VOCECHAT_SERVER_VERION-$PLATFORM.zip"
 BIN_URL="https://sh.voce.chat/$BIN_NAME"
-echo "Download URL: $BIN_URL"
+echo "Downloading URL: $BIN_URL"
 
 # clear old data:
 kill `pidof vocechat-server` 2>/dev/null
-curl -sf $BIN_URL -o vocechat-server.zip || exit
+if test ! -f vocechat-server.zip; then
+  curl --progress-bar -f $BIN_URL -o vocechat-server.zip || exit
+fi
 unzip -oq vocechat-server.zip || exit
 chmod a+x vocechat-server
 
-curl -sf "https://sh.voce.chat/vocechat-server.sh" -o vocechat-server.sh || exit
+
+curl -f "https://sh.voce.chat/vocechat-server.sh" -o vocechat-server.sh || exit
 if test "$DOMAIN" != ""; then
   sed -i "s/# domain = .*\$/domain = \"$DOMAIN\"/ig" config/config.toml
   echo $HTTPS_ON

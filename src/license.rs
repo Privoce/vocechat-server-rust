@@ -24,7 +24,9 @@ pub static G_LICENSE: Lazy<Mutex<License>> = Lazy::new(|| Mutex::new(License::de
 pub fn get_referer_domain(req: &Request) -> Option<String> {
     let referer = req.header("Referer").unwrap_or_default();
     let u = url::Url::parse(referer).ok()?;
-    u.domain().map(|v| v.to_string())
+    u.domain()
+        .map(|v| v.to_string())
+        .or_else(||u.host().map(|v| v.to_string()))
 }
 
 pub async fn load_license(state: &State) -> Result<()> {
