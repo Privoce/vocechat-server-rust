@@ -6,7 +6,7 @@ use rsa::{PaddingScheme, PublicKey, RsaPrivateKey, RsaPublicKey};
 
 #[derive(Debug)]
 pub struct License {
-    pub domain: String,
+    pub domains: Vec<String>,
     pub user_limit: u32,
     pub created_at: DateTime<Utc>,
     pub expired_at: DateTime<Utc>,
@@ -16,7 +16,7 @@ pub struct License {
 impl Default for License {
     fn default() -> Self {
         License {
-            domain: "".to_string(),
+            domains: vec![],
             user_limit: 0,
             created_at: chrono::MIN_DATETIME,
             expired_at: chrono::MIN_DATETIME,
@@ -27,14 +27,14 @@ impl Default for License {
 
 impl License {
     pub fn encode(&self) -> String {
-        format!("{},{},{}", self.domain, self.created_at, self.expired_at)
+        format!("{},{},{}", self.domains.join("|"), self.created_at, self.expired_at)
     }
 
     #[allow(clippy::inherent_to_string)]
     pub fn to_string(&self) -> String {
         let data = format!(
             "{},{},{},{},{}",
-            self.domain,
+            self.domains.join("|"),
             self.user_limit,
             self.created_at.to_rfc3339(),
             self.expired_at.to_rfc3339(),
@@ -59,7 +59,7 @@ impl License {
 
         let sign = hex::decode(arr[4])?;
         Ok(License {
-            domain: arr[0].to_string(),
+            domains: arr[0].split('|').map(|v|v.to_string()).collect::<Vec<_>>(),
             user_limit,
             created_at,
             expired_at,
@@ -92,10 +92,10 @@ impl LicenseGenerator {
         })
     }
 
-    pub fn gen(&self, domain: &str, expired_at: DateTime<Utc>, user_limit: u32) -> License {
+    pub fn gen(&self, domains: &str, expired_at: DateTime<Utc>, user_limit: u32) -> License {
         let created_at = Utc::now();
         let mut license = License {
-            domain: domain.to_string(),
+            domains: domains.split('|').map(|v|v.to_string()).collect::<Vec<_>>(),
             user_limit,
             created_at,
             expired_at,
@@ -170,8 +170,9 @@ mod test {
         let (private_key, public_key) = gen_rsa_pair();
         let licensegen = LicenseGenerator::new(private_key, public_key);
         let expired_at = Utc::now().add(chrono::Duration::seconds(365 * 86400));
-        let license = licensegen.gen("www.domain.com", expired_at, 10);
-        assert_eq!(license.domain, "www.domain.com");
+        let license = licensegen.gen("www.domain.com|www.domain2.com", expired_at, 10);
+        assert_eq!(license.domains[0], "www.domain.com");
+        assert_eq!(license.domains[1], "www.domain2.com");
         assert_eq!(license.expired_at, expired_at);
         let b = licensegen.check(&license.to_string());
         assert_eq!(b.is_ok(), true);
@@ -182,7 +183,7 @@ mod test {
         let (private_key, public_key) = gen_rsa_pair();
         let licensegen = LicenseGenerator::new(private_key, public_key.clone());
         let expired_at = Utc::now().add(chrono::Duration::seconds(365 * 86400));
-        let license = licensegen.gen("www.domain.com", expired_at, 20);
+        let license = licensegen.gen("www.domain.com|www.domain2.com", expired_at, 20);
 
         let license_bs58 = license.to_string();
 
@@ -237,7 +238,7 @@ dnwtOymXGQpaS/Vfo0q1kGzZoXsCx3v7BQIDAQAB
         let expired_at =
             chrono::NaiveDateTime::new(expired_at, chrono::NaiveTime::from_hms(0, 0, 0));
         let expired_at = chrono::DateTime::<Utc>::from_utc(expired_at, Utc);
-        let license = licensegen.gen("www.domain.com", expired_at, 20);
+        let license = licensegen.gen("www.domain.com|www.domain2.com", expired_at, 20);
 
         let license_bs58 = license.to_string();
         //dbg!(license_bs58);

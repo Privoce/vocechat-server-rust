@@ -138,6 +138,7 @@ impl TestServer {
         let resp = self
             .client
             .post("/api/token/login")
+            .header("Referer", "http://localhost/")
             .body_json(&json!({
                 "credential": {
                     "type": "password",
@@ -172,6 +173,7 @@ impl TestServer {
             .client
             .post("/api/admin/user")
             .header("X-API-Key", token.as_ref())
+            .header("Referer", "http://localhost/")
             .body_json(&json!({
                 "email": email.as_ref(),
                 "password": "123456",
@@ -196,6 +198,7 @@ impl TestServer {
             .client
             .post(format!("/api/user/{}/send", uid))
             .header("X-API-Key", token.as_ref())
+            .header("Referer", "http://localhost/")
             .content_type("text/plain")
             .body(text.into())
             .send()
@@ -214,6 +217,7 @@ impl TestServer {
             .client
             .post(format!("/api/group/{}/send", gid))
             .header("X-API-Key", token.as_ref())
+            .header("Referer", "http://localhost/")
             .content_type("text/plain")
             .body(text.into())
             .send()
@@ -239,6 +243,7 @@ impl TestServer {
             .client
             .get("/api/user/events")
             .query("api-key", &token.as_ref())
+            .header("Referer", "http://localhost/")
             .content_type("text/event-stream");
         if let Some(after_mid) = after_mid {
             builder = builder.query("after_mid", &after_mid);

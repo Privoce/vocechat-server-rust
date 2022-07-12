@@ -21,12 +21,14 @@ dnwtOymXGQpaS/Vfo0q1kGzZoXsCx3v7BQIDAQAB
 // pub static mut g_license: Lazy<License> = Lazy::new(||License::default());
 pub static G_LICENSE: Lazy<Mutex<License>> = Lazy::new(|| Mutex::new(License::default()));
 
+/// inline always, Increase the difficulty of disassembly
+#[inline(always)]
 pub fn get_referer_domain(req: &Request) -> Option<String> {
     let referer = req.header("Referer").unwrap_or_default();
     let u = url::Url::parse(referer).ok()?;
     u.domain()
         .map(|v| v.to_string())
-        .or_else(||u.host().map(|v| v.to_string()))
+        .or_else(|| u.host().map(|v| v.to_string()))
 }
 
 pub async fn load_license(state: &State) -> Result<()> {
@@ -41,7 +43,7 @@ pub async fn load_license(state: &State) -> Result<()> {
     G_LICENSE.lock().await.created_at = license.created_at;
     G_LICENSE.lock().await.expired_at = license.expired_at;
     G_LICENSE.lock().await.user_limit = license.user_limit;
-    G_LICENSE.lock().await.domain = license.domain;
+    G_LICENSE.lock().await.domains = license.domains;
     G_LICENSE.lock().await.sign = license.sign;
 
     Ok(())
@@ -56,31 +58,31 @@ pub async fn update_license(state: &State, new_license: &str) -> Result<()> {
     G_LICENSE.lock().await.created_at = license.created_at;
     G_LICENSE.lock().await.expired_at = license.expired_at;
     G_LICENSE.lock().await.user_limit = license.user_limit;
-    G_LICENSE.lock().await.domain = license.domain;
+    G_LICENSE.lock().await.domains = license.domains;
     G_LICENSE.lock().await.sign = license.sign;
 
     Ok(())
 }
 
-#[inline]
+/// inline always, Increase the difficulty of disassembly
+#[inline(always)]
 pub async fn check_license(state: &State, req: &Request) -> Result<()> {
-    if cfg!(test) {
+    if cfg!(test) && req.header("Referer").is_none() {
         return Ok(());
     }
     let domain = get_referer_domain(req)
         .ok_or_else(|| anyhow::anyhow!("License error: Referer is empty."))?;
     let license_guard = G_LICENSE.lock().await;
     let license = license_guard.deref();
-    if license.domain.as_str() == "localhost" {
+    if domain == "localhost" {
         return Ok(());
     }
-    if license.domain.as_str() != "*" && license.domain != domain {
+    if !license.domains.contains(&domain) && !license.domains.contains(&"*".to_string()) {
         return Err(anyhow::anyhow!("License error: Domain incorrect."));
     }
     if license.expired_at < Utc::now() {
         return Err(anyhow::anyhow!("License error: Expired."));
     }
-
     if vc_license::rsa_check_license(license, VOCE_LICENSE_PUBLIC_KEY_PEM).is_err() {
         return Err(anyhow::anyhow!("License error: Sign invalid."));
     }
