@@ -24,6 +24,7 @@ pub struct LicenseReply {
     pub created_at: chrono::DateTime<Utc>,
     pub expired_at: chrono::DateTime<Utc>,
     pub sign: bool,
+    pub base58: String,
 }
 
 pub struct ApiLicense;
@@ -58,6 +59,7 @@ impl ApiLicense {
             created_at: license.created_at,
             expired_at: license.expired_at,
             sign: sign_is_ok,
+            base58: license_bs58,
         }))
     }
 
@@ -104,6 +106,7 @@ impl ApiLicense {
             created_at: license.created_at,
             expired_at: license.expired_at,
             sign: sign_is_ok,
+            base58: license_bs58,
         }))
     }
 }
