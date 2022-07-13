@@ -1,0 +1,46 @@
+# webclient_url = "https://github.com/Privoce/vocechat-web/releases/latest/download"
+webclient_url = "https://github.com/Privoce/vocechat-web/releases/download/v0.3.0"
+
+[system]
+data_dir = "./data"
+token_expiry_seconds = 300
+refresh_token_expiry_seconds = 604800
+# magic_token_expiry_seconds = 600
+
+[network]
+bind = "0.0.0.0:3000"
+# domain = "chat.privoce.com"
+frontend_url = "http://1.2.3.4:4000"
+
+# [network.tls]
+# type = "self_signed"
+
+# [network.tls]
+# type = "certificate"
+# cert = "...."
+# key = "...."
+# path = "./cert/"
+
+# [network.tls]
+# type = "acme_http_01"
+# directory_url = "https://acme-v02.api.letsencrypt.org/directory"
+# http_bind = "0.0.0.0:80"
+# cache_path = "./data/cert"
+
+# [network.tls]
+# type = "acme_tls_alpn_01"
+# directory_url = "https://acme-v02.api.letsencrypt.org/directory"
+# cache_path = "./data/cert"
+
+[template.register_by_email]
+subject = "Register code"
+file = "templates/register_by_email.html"
+
+[template.login_by_email]
+subject = "Your sign-in link for Vocechat"
+file = "templates/login_by_email.html"
+
+#[[user]]
+#name = "Guest"
+#password = "123456"
+#email = "guest@voce.chat"

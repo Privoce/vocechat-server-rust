@@ -1,0 +1,174 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+    branches-ignore:
+      - 'main'
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - build: linux
+            os: ubuntu-latest
+            rust: stable
+            target: x86_64-unknown-linux-musl
+            pre_install: sudo apt-get install -y rsync
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+            pre_install: brew install rsync
+#          - build: macos-arm
+#            os: macos-latest
+#            rust: stable
+#            target: aarch64-apple-darwin
+#            cross: true
+#            pre_install: brew install rsync
+          - build: arm-v7
+            os: ubuntu-latest
+            rust: stable
+            target: armv7-unknown-linux-musleabihf
+            cross: true
+            pre_install: sudo apt-get install -y rsync
+          - build: aarch64
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-unknown-linux-musl
+            cross: true
+            pre_install: sudo apt-get install -y rsync
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.NEW_GEN_ACTIONS_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VOCECHAT_COM_HOST }}
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.VOCECHAT_COM_HOST }} >> ~/.ssh/known_hosts
+      - name: Install rsync
+        run: ${{ matrix.pre_install }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions/checkout@v2
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ matrix.target }}
+      - run: |
+          cp target/${{ matrix.target }}/release/vocechat-server ./vocechat-server
+          zip -r ./vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip ./vocechat-server config
+      - if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: |
+          docker -v
+          cp -rf target/${{ matrix.target }}/release/vocechat-server build/docker/
+          cd build/docker
+          cp -rf ../../config ./
+          docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
+          # build latest
+          docker build -t vocechat-server:latest .
+          docker tag vocechat-server:latest privoce/vocechat-server:latest
+          docker push privoce/vocechat-server:latest
+          # build version
+          docker build -t vocechat-server:${{ github.ref_name}} .
+          docker tag vocechat-server:${{ github.ref_name}} privoce/vocechat-server:${{ github.ref_name}}
+          docker push privoce/vocechat-server:${{ github.ref_name}}
+      - if: matrix.target == 'aarch64-unknown-linux-musl'
+        run: |
+          docker -v
+          cp -rf target/${{ matrix.target }}/release/vocechat-server build/docker/
+          cd build/docker
+          cp -rf ../../config ./
+          docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
+          # build latest
+          docker build -t vocechat-server:latest-arm64 .
+          docker tag vocechat-server:latest-arm64 privoce/vocechat-server:latest-arm64
+          docker push privoce/vocechat-server:latest-arm64
+          # build version
+          docker build -t vocechat-server:${{ github.ref_name}}-arm64 .
+          docker tag vocechat-server:${{ github.ref_name}}-arm64 privoce/vocechat-server:${{ github.ref_name}}-arm64
+          docker push privoce/vocechat-server:${{ github.ref_name}}-arm64
+      - name: rsync to sh.voce.chat
+        run: |
+          rsync -av vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip root@${{ secrets.VOCECHAT_COM_HOST }}:/home/wwwroot/sh.voce.chat/vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: vocechat-server-${{ github.ref_name}}-${{ matrix.target }}
+          path: vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+  add:
+    runs-on: ubuntu-latest
+    needs: [ build, release ]
+    strategy:
+      matrix:
+        include:
+          - build: linux
+            os: ubuntu-latest
+            rust: stable
+            target: x86_64-unknown-linux-musl
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+#          - build: macos-arm
+#            os: macos-latest
+#            rust: stable
+#            target: aarch64-apple-darwin
+#            cross: true
+#            pre_install: brew install rsync
+          - build: arm-v7
+            os: ubuntu-latest
+            rust: stable
+            target: armv7-unknown-linux-musleabihf
+            cross: true
+          - build: aarch64
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-unknown-linux-musl
+            cross: true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: vocechat-server-${{ github.ref_name}}-${{ matrix.target }}
+      - name: Upload Artifact to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
+          asset_name: vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
+          asset_content_type: application/zip
+          
