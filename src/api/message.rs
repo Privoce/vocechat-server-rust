@@ -86,8 +86,8 @@ impl ChatMessageContent {
                     Some(msg)
                 }
             }
-            "text/markdown" => Some("You hava a new message".to_string()),
-            "vocechat/file" => Some("You hava a new file".to_string()),
+            "text/markdown" => Some("You have a new message".to_string()),
+            "vocechat/file" => Some("You have a new file".to_string()),
             _ => None,
         }
     }
