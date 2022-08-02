@@ -17,7 +17,7 @@ Vocechat is an open-source product with a free community version and only charge
 ### Project composition:
 | Name     | Tech    | Project                                                         | License | Comment                                             |
 |----------|---------|-----------------------------------------------------------------|---------|-----------------------------------------------------|
-| Server:  | Rust    | [vocechat-server](https://github.com/privoce/vocechat-server)   | MIT     | Server Supports platforms: Linux, Windows, Arm32/64 |
+| Server:  | Rust    | [vocechat-server](https://github.com/privoce/vocechat-server)   | TBD     | Server Supports platforms: Linux, Windows, Arm32/64 |
 | Client:  | Flutter | [vocechat-client](https://github.com/privoce/vocechat-client)   | ---     | Client supports Android and IOS platforms           |
 | Web:     | React   | [vocechat-web](https://github.com/privoce/vocechat-web)         | ---     | Web App, integrated management                      |
 | Web-SDK: | React   | [vocechat-web-sdk](https://github.com/privoce/vocechat-web-sdk) | ---     | JS-SDK Can be intergrated into other products.      |
@@ -105,7 +105,7 @@ Vocechat is an open-source product with a free community version and only charge
         <td>✅</td>
         <td>✅</td>
         <td>❌</td>
-        <td align="left">Protocal</td>
+        <td align="left">Protocol</td>
         <td>2014</td>
     </tr>
     <tr align="center">
@@ -127,7 +127,7 @@ Vocechat is an open-source product with a free community version and only charge
         <td>✅</td>
         <td>✅</td>
         <td>❌</td>
-        <td align="left">Protocal</td>
+        <td align="left">Protocol</td>
         <td>1999</td>
     </tr>
     <tr align="center">
@@ -354,8 +354,8 @@ Vocechat is an open-source product with a free community version and only charge
 
 
 ### Contact Us
-Github: [https://github.com/privoce/vocechat-server](https://github.com/privoce/vocechat-server)  
-Email: [admin@voce.chat](admin@voce.chat)
+<!-- Github: [https://github.com/privoce/vocechat-server](https://github.com/privoce/vocechat-server)   -->
+Our server: [privoce.voce.chat](privoce.voce.chat)
 <!--
 Twitter: [https://twitter.com/vocechat](https://twitter.com/vocechat)  
 Discord: [https://discord.com/vocechat](https://discord.com/vocechat)  
