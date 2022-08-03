@@ -109,12 +109,12 @@ jobs:
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
-        with:
-          delete_release: true
-          tag_name: ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
+#      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+#        with:
+#          delete_release: true
+#          tag_name: ${{ github.ref_name }}
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
       - uses: actions/checkout@v2
       - name: Create Release
         id: create_release
