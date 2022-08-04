@@ -1024,6 +1024,7 @@ impl ApiToken {
                         let create_user = CreateUser::new(
                             &name,
                             CreateUserBy::ThirdParty {
+                                thirdparty_uid: &info.userid,
                                 username: &info.username,
                             },
                             false,
@@ -2038,5 +2039,38 @@ mod tests {
         let obj = json.value().object();
         let user = obj.get("user").object();
         user.get("name").assert_string("usertest");
+        let uid1 = user.get("uid").i64();
+
+        let resp = server
+            .post("/api/token/create_third_party_key")
+            .body_json(&json!({
+                "userid": "u1",
+                "username": "usertest"
+            }))
+            .header(
+                "X-SECRET",
+                &server.state().key_config.read().await.third_party_secret,
+            )
+            .send()
+            .await;
+        resp.assert_status_is_ok();
+        let key = resp.json().await.value().string().to_string();
+
+        let resp = server
+            .post("/api/token/login")
+            .body_json(&json!({
+                "credential": {
+                    "type": "thirdparty",
+                    "key": key,
+                }
+            }))
+            .send()
+            .await;
+        let json = resp.json().await;
+        let obj = json.value().object();
+        let user = obj.get("user").object();
+        let uid2 = user.get("uid").i64();
+
+        assert_eq!(uid1, uid2);
     }
 }

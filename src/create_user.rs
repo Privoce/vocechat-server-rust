@@ -34,6 +34,7 @@ pub enum CreateUserBy<'a> {
         public_address: &'a str,
     },
     ThirdParty {
+        thirdparty_uid: &'a str,
         username: &'a str,
     },
 }
@@ -235,6 +236,15 @@ impl State {
                 let sql = "insert into metamask_auth (public_address, uid) values (?, ?)";
                 sqlx::query(sql)
                     .bind(public_address)
+                    .bind(uid)
+                    .execute(&mut tx)
+                    .await
+                    .map_err(InternalServerError)?;
+            }
+            CreateUserBy::ThirdParty { thirdparty_uid, .. } => {
+                let sql = "insert into third_party_users (userid, uid) values (?, ?)";
+                sqlx::query(sql)
+                    .bind(thirdparty_uid)
                     .bind(uid)
                     .execute(&mut tx)
                     .await
