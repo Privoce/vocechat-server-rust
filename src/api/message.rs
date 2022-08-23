@@ -23,7 +23,7 @@ use crate::{
         group::Group, resource::FileMeta, user::UserInfo, DateTime, FcmConfig, LangId,
         PinnedMessage, UpdateAction,
     },
-    state::{BroadcastEvent, Cache},
+    state::{BroadcastEvent, Cache, UserStatus},
     State,
 };
 
@@ -801,37 +801,39 @@ pub async fn send_message(state: &State, mut payload: ChatMessagePayload) -> poe
         MessageTarget::User(MessageTargetUser { uid }) => {
             // send notify
             if let Some(user) = cache.users.get(&payload.from_uid) {
-                if let Some(notify_message) = payload.notify_message(&cache, &mentions) {
-                    let target_user = match cache.users.get(&uid) {
-                        Some(user) => user,
-                        None => return Err(Error::from_status(StatusCode::NOT_FOUND)),
-                    };
+                if user.status == UserStatus::Normal {
+                    if let Some(notify_message) = payload.notify_message(&cache, &mentions) {
+                        let target_user = match cache.users.get(&uid) {
+                            Some(user) => user,
+                            None => return Err(Error::from_status(StatusCode::NOT_FOUND)),
+                        };
 
-                    let notify_tokens = if !target_user.is_user_muted(payload.from_uid) {
-                        target_user
-                            .devices
-                            .values()
-                            .filter_map(|device| device.device_token.clone())
-                            .collect_vec()
-                    } else {
-                        vec![]
-                    };
+                        let notify_tokens = if !target_user.is_user_muted(payload.from_uid) {
+                            target_user
+                                .devices
+                                .values()
+                                .filter_map(|device| device.device_token.clone())
+                                .collect_vec()
+                        } else {
+                            vec![]
+                        };
 
-                    let key_config = state.key_config.read().await;
-                    let data = serde_json::json!({
-                        "vocechat_server_id": &key_config.server_id,
-                        "vocechat_from_uid": from_uid.to_string(),
-                        "vocechat_to_uid": uid.to_string(),
-                    });
+                        let key_config = state.key_config.read().await;
+                        let data = serde_json::json!({
+                            "vocechat_server_id": &key_config.server_id,
+                            "vocechat_from_uid": from_uid.to_string(),
+                            "vocechat_to_uid": uid.to_string(),
+                        });
 
-                    send_notify(
-                        state.clone(),
-                        notify_tokens,
-                        user.name.clone(),
-                        notify_message,
-                        data,
-                    )
-                    .await;
+                        send_notify(
+                            state.clone(),
+                            notify_tokens,
+                            user.name.clone(),
+                            notify_message,
+                            data,
+                        )
+                        .await;
+                    }
                 }
             };
 
@@ -884,6 +886,10 @@ pub async fn send_message(state: &State, mut payload: ChatMessagePayload) -> poe
                         .iter()
                         .filter_map(|uid| match cache.users.get(uid) {
                             Some(user) if *uid != payload.from_uid => {
+                                if user.status != UserStatus::Normal {
+                                    return None;
+                                }
+
                                 if mentions.contains(uid) || !user.is_group_muted(gid) {
                                     Some(
                                         user.devices
@@ -898,6 +904,7 @@ pub async fn send_message(state: &State, mut payload: ChatMessagePayload) -> poe
                         })
                         .flatten()
                         .collect::<Vec<_>>();
+
                     send_notify(
                         state.clone(),
                         notify_tokens,
@@ -910,7 +917,7 @@ pub async fn send_message(state: &State, mut payload: ChatMessagePayload) -> poe
             }
 
             // send message
-            let res = tokio::task::spawn_blocking({
+            tokio::task::spawn_blocking({
                 let state = state.clone();
                 move || {
                     internal_send_message(
@@ -924,8 +931,7 @@ pub async fn send_message(state: &State, mut payload: ChatMessagePayload) -> poe
                 }
             })
             .await
-            .map_err(InternalServerError)??;
-            res
+            .map_err(InternalServerError)??
         }
     };
 

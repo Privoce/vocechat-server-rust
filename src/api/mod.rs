@@ -43,6 +43,7 @@ pub use message::{
 };
 pub use resource::FileMeta;
 pub use token::CurrentUser;
+pub use token::Token;
 pub use user::{
     CreateUserConflictReason, CreateUserResponse, UpdateUserResponse, UserConflict, UserInfo,
 };

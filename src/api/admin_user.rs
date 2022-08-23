@@ -7,11 +7,10 @@ use poem_openapi::{param::Path, payload::Json, Object, OpenApi};
 use crate::{
     api::{
         tags::ApiTags, token::Token, CreateUserConflictReason, CreateUserResponse, DateTime,
-        KickFromGroupReason, KickReason, LangId, UpdateAction, UpdateUserResponse, UserConflict,
-        UserUpdateLog,
+        KickReason, LangId, UpdateAction, UpdateUserResponse, UserConflict, UserUpdateLog,
     },
     create_user::{CreateUser, CreateUserBy, CreateUserError},
-    state::{BroadcastEvent, GroupType, UserEvent, UserStatus},
+    state::{BroadcastEvent, UserEvent, UserStatus},
     State,
 };
 
@@ -152,6 +151,7 @@ impl ApiAdminUser {
         let users = cache
             .users
             .iter()
+            .filter(|(_, user)| !user.is_guest)
             .map(|(uid, user)| user.api_user(*uid))
             .collect();
         Ok(Json(users))
@@ -164,127 +164,12 @@ impl ApiAdminUser {
             return Err(Error::from_status(StatusCode::FORBIDDEN));
         }
 
-        let mut cache = state.cache.write().await;
-        if !cache.users.contains_key(&token.uid) {
-            return Err(Error::from(StatusCode::NOT_FOUND));
-        }
-
         if uid.0 == token.uid || uid.0 == 1 {
             // cannot delete self and founder
-            return Err(Error::from(StatusCode::FORBIDDEN));
+            return Err(poem::Error::from(StatusCode::FORBIDDEN));
         }
 
-        // begin transaction
-        let mut tx = state.db_pool.begin().await.map_err(InternalServerError)?;
-
-        // delete from user table
-        sqlx::query("delete from user where uid = ?")
-            .bind(uid.0)
-            .execute(&mut tx)
-            .await
-            .map_err(InternalServerError)?;
-
-        // insert into user_log table
-        let log_id = sqlx::query("insert into user_log (uid, action) values (?, ?)")
-            .bind(uid.0)
-            .bind(UpdateAction::Delete)
-            .execute(&mut tx)
-            .await
-            .map_err(InternalServerError)?
-            .last_insert_rowid();
-
-        // commit transaction
-        tx.commit().await.map_err(InternalServerError)?;
-
-        // update cache
-        if let Some(cached_user) = cache.users.remove(&uid.0) {
-            // close all subscriptions
-            for device in cached_user.devices.into_values() {
-                if let Some(sender) = device.sender {
-                    let _ = sender.send(UserEvent::Kick {
-                        reason: KickReason::DeleteUser,
-                    });
-                }
-            }
-        }
-
-        let mut removed_groups_id = Vec::new();
-        let mut removed_groups = Vec::new();
-        let mut exit_from_private_group = Vec::new();
-        let mut exit_from_public_group = Vec::new();
-
-        for (gid, group) in cache.groups.iter_mut() {
-            match group.ty {
-                GroupType::Public => {
-                    exit_from_public_group.push(*gid);
-                }
-                GroupType::Private { owner } if owner == uid.0 => {
-                    removed_groups_id.push(*gid);
-                }
-                GroupType::Private { .. } => {
-                    group.members.remove(&uid);
-                    exit_from_private_group.push((*gid, group.members.clone()));
-                }
-            }
-        }
-
-        for gid in &removed_groups_id {
-            removed_groups.extend(cache.groups.remove(gid).map(|group| (*gid, group)));
-        }
-        for user in cache.users.values_mut() {
-            user.read_index_user.remove(&uid.0);
-        }
-        for user in cache.users.values_mut() {
-            for gid in &removed_groups_id {
-                user.read_index_group.remove(gid);
-            }
-        }
-
-        // broadcast event
-        let _ = state
-            .event_sender
-            .send(Arc::new(BroadcastEvent::UserLog(UserUpdateLog {
-                log_id,
-                action: UpdateAction::Delete,
-                uid: uid.0,
-                email: None,
-                name: None,
-                gender: None,
-                language: None,
-                is_admin: None,
-                avatar_updated_at: None,
-            })));
-
-        for (gid, group) in removed_groups {
-            let _ = state
-                .event_sender
-                .send(Arc::new(BroadcastEvent::KickFromGroup {
-                    targets: group.members.iter().copied().collect(),
-                    gid,
-                    reason: KickFromGroupReason::GroupDeleted,
-                }));
-        }
-
-        for (gid, members) in exit_from_private_group {
-            let _ = state
-                .event_sender
-                .send(Arc::new(BroadcastEvent::UserLeavedGroup {
-                    targets: members,
-                    gid,
-                    uid: vec![uid.0],
-                }));
-        }
-
-        for gid in exit_from_public_group {
-            let _ = state
-                .event_sender
-                .send(Arc::new(BroadcastEvent::UserLeavedGroup {
-                    targets: cache.users.keys().copied().collect(),
-                    gid,
-                    uid: vec![uid.0],
-                }));
-        }
-
+        state.delete_user(uid.0).await?;
         Ok(())
     }
 

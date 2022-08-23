@@ -4,6 +4,7 @@ mod api;
 mod config;
 mod create_user;
 mod license;
+mod middleware;
 mod self_signed;
 mod server;
 mod state;
@@ -271,6 +272,16 @@ fn main() {
                             state.clean_files();
                         }
                     });
+                }
+            }
+        });
+
+        tokio::spawn({
+            let state = state.clone();
+            async move {
+                loop {
+                    tokio::time::sleep(Duration::from_secs(60 * 60 * 24)).await;
+                    state.clean_guest().await;
                 }
             }
         });

@@ -45,6 +45,7 @@ use crate::{
         UsersUpdateLogMessage,
     },
     create_user::{CreateUser, CreateUserBy, CreateUserError},
+    middleware::guest_forbidden,
     state::{BroadcastEvent, Cache, CacheUser, UserEvent},
     SqlitePool, State,
 };
@@ -653,7 +654,11 @@ impl ApiUser {
         Ok(Json(user.api_user_info(uid.0)))
     }
 
-    #[oai(path = "/change_password", method = "post")]
+    #[oai(
+        path = "/change_password",
+        method = "post",
+        transform = "guest_forbidden"
+    )]
     async fn change_password(
         &self,
         state: Data<&State>,
@@ -685,7 +690,7 @@ impl ApiUser {
     }
 
     /// Update the current user information
-    #[oai(path = "/", method = "put")]
+    #[oai(path = "/", method = "put", transform = "guest_forbidden")]
     async fn update_user(
         &self,
         state: Data<&State>,
@@ -798,7 +803,7 @@ impl ApiUser {
     }
 
     /// Upload avatar
-    #[oai(path = "/avatar", method = "post")]
+    #[oai(path = "/avatar", method = "post", transform = "guest_forbidden")]
     async fn upload_avatar(
         &self,
         state: Data<&State>,
@@ -887,7 +892,7 @@ impl ApiUser {
     }
 
     /// Send message to the specified user
-    #[oai(path = "/:uid/send", method = "post")]
+    #[oai(path = "/:uid/send", method = "post", transform = "guest_forbidden")]
     async fn send(
         &self,
         state: Data<&State>,
@@ -992,7 +997,11 @@ impl ApiUser {
     }
 
     /// Delete current user's specified device
-    #[oai(path = "/devices/:device", method = "delete")]
+    #[oai(
+        path = "/devices/:device",
+        method = "delete",
+        transform = "guest_forbidden"
+    )]
     async fn delete_device(
         &self,
         state: Data<&State>,
@@ -1439,6 +1448,13 @@ impl ApiUser {
                 },
             }));
 
+        Ok(())
+    }
+
+    /// Delete current user
+    #[oai(path = "/delete", method = "get")]
+    async fn delete_current_user(&self, state: Data<&State>, token: Token) -> Result<()> {
+        state.delete_user(token.uid).await?;
         Ok(())
     }
 }
@@ -2356,7 +2372,7 @@ mod tests {
                     "name": "user3@voce.chat",
                     "gender": 1,
                     "language": "en-US",
-                    "is_admin": null,
+                    "is_admin": false,
                     "avatar_updated_at": 0,
                 }),
                 json!({

@@ -30,6 +30,7 @@ use crate::{
         AgoraConfig, ChatMessage, DateTime, GroupChangedMessage, KickFromGroupReason,
         MessageTarget,
     },
+    middleware::guest_forbidden,
     state::{BroadcastEvent, CacheGroup, GroupType},
     State,
 };
@@ -112,7 +113,7 @@ pub struct ApiGroup;
 #[OpenApi(prefix_path = "/group", tag = "ApiTags::Group")]
 impl ApiGroup {
     /// Create a new group
-    #[oai(path = "/", method = "post")]
+    #[oai(path = "/", method = "post", transform = "guest_forbidden")]
     async fn create(
         &self,
         state: Data<&State>,
@@ -676,7 +677,7 @@ impl ApiGroup {
     }
 
     /// Send message to the specified group
-    #[oai(path = "/:gid/send", method = "post")]
+    #[oai(path = "/:gid/send", method = "post", transform = "guest_forbidden")]
     async fn send(
         &self,
         state: Data<&State>,

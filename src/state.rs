@@ -27,6 +27,7 @@ use sqlx::SqlitePool;
 use tokio::sync::{broadcast, mpsc, Mutex, RwLock};
 use walkdir::WalkDir;
 
+use crate::api::UpdateAction;
 use crate::{
     api::{
         get_merged_message, ChatMessage, DateTime, Group, GroupChangedMessage, KickFromGroupReason,
@@ -129,6 +130,7 @@ pub struct CacheUser {
     pub updated_at: DateTime,
     pub avatar_updated_at: DateTime,
     pub status: UserStatus,
+    pub is_guest: bool,
 }
 
 impl CacheUser {
@@ -392,7 +394,7 @@ pub struct State {
 impl State {
     pub async fn load_users_cache(db: &SqlitePool) -> sqlx::Result<BTreeMap<i64, CacheUser>> {
         let mut users = BTreeMap::new();
-        let sql = "select uid, email, name, password, gender, is_admin, language, create_by, created_at, updated_at, avatar_updated_at, status from user";
+        let sql = "select uid, email, name, password, gender, is_admin, language, create_by, created_at, updated_at, avatar_updated_at, status, is_guest from user";
         let mut stream = sqlx::query_as::<
             _,
             (
@@ -408,6 +410,7 @@ impl State {
                 DateTime,
                 DateTime,
                 i8,
+                bool,
             ),
         >(sql)
         .fetch(db);
@@ -425,6 +428,7 @@ impl State {
                 updated_at,
                 avatar_updated_at,
                 status,
+                is_guest,
             ) = res?;
 
             let devices = sqlx::query_as::<_, (String, Option<String>)>(
@@ -525,6 +529,7 @@ impl State {
                     updated_at,
                     avatar_updated_at,
                     status: status.into(),
+                    is_guest,
                 },
             );
         }
@@ -972,6 +977,147 @@ impl State {
                     .downcast_ref::<Arc<T::Instance>>()
                     .map(Clone::clone)
             })
+    }
+
+    pub async fn clean_guest(&self) {
+        if let Ok(users) = sqlx::query_as::<_, (i64,)>(
+            "select uid from user where is_guest = true and time('now', '-7 days') >= created_at",
+        )
+        .fetch_all::<_>(&self.db_pool)
+        .await
+        {
+            for (uid,) in users {
+                let _ = self.delete_user(uid).await;
+            }
+        }
+    }
+
+    pub async fn delete_user(&self, uid: i64) -> poem::Result<()> {
+        let mut cache = self.cache.write().await;
+        let is_guest = match cache.users.get(&uid) {
+            Some(user) => user.is_guest,
+            None => return Err(poem::Error::from(StatusCode::NOT_FOUND)),
+        };
+
+        // begin transaction
+        let mut tx = self.db_pool.begin().await.map_err(InternalServerError)?;
+
+        // delete from user table
+        sqlx::query("delete from user where uid = ?")
+            .bind(uid)
+            .execute(&mut tx)
+            .await
+            .map_err(InternalServerError)?;
+
+        let log_id = if !is_guest {
+            // insert into user_log table
+            let log_id = sqlx::query("insert into user_log (uid, action) values (?, ?)")
+                .bind(uid)
+                .bind(UpdateAction::Delete)
+                .execute(&mut tx)
+                .await
+                .map_err(InternalServerError)?
+                .last_insert_rowid();
+            Some(log_id)
+        } else {
+            None
+        };
+
+        // commit transaction
+        tx.commit().await.map_err(InternalServerError)?;
+
+        // update cache
+        if let Some(cached_user) = cache.users.remove(&uid) {
+            // close all subscriptions
+            for device in cached_user.devices.into_values() {
+                if let Some(sender) = device.sender {
+                    let _ = sender.send(UserEvent::Kick {
+                        reason: KickReason::DeleteUser,
+                    });
+                }
+            }
+        }
+
+        let mut removed_groups_id = Vec::new();
+        let mut removed_groups = Vec::new();
+        let mut exit_from_private_group = Vec::new();
+        let mut exit_from_public_group = Vec::new();
+
+        for (gid, group) in cache.groups.iter_mut() {
+            match group.ty {
+                GroupType::Public => {
+                    exit_from_public_group.push(*gid);
+                }
+                GroupType::Private { owner } if owner == uid => {
+                    removed_groups_id.push(*gid);
+                }
+                GroupType::Private { .. } => {
+                    group.members.remove(&uid);
+                    exit_from_private_group.push((*gid, group.members.clone()));
+                }
+            }
+        }
+
+        for gid in &removed_groups_id {
+            removed_groups.extend(cache.groups.remove(gid).map(|group| (*gid, group)));
+        }
+        for user in cache.users.values_mut() {
+            user.read_index_user.remove(&uid);
+        }
+        for user in cache.users.values_mut() {
+            for gid in &removed_groups_id {
+                user.read_index_group.remove(gid);
+            }
+        }
+
+        // broadcast event
+        if let Some(log_id) = log_id {
+            let _ = self
+                .event_sender
+                .send(Arc::new(BroadcastEvent::UserLog(UserUpdateLog {
+                    log_id,
+                    action: UpdateAction::Delete,
+                    uid,
+                    email: None,
+                    name: None,
+                    gender: None,
+                    language: None,
+                    is_admin: None,
+                    avatar_updated_at: None,
+                })));
+
+            for (gid, group) in removed_groups {
+                let _ = self
+                    .event_sender
+                    .send(Arc::new(BroadcastEvent::KickFromGroup {
+                        targets: group.members.iter().copied().collect(),
+                        gid,
+                        reason: KickFromGroupReason::GroupDeleted,
+                    }));
+            }
+
+            for (gid, members) in exit_from_private_group {
+                let _ = self
+                    .event_sender
+                    .send(Arc::new(BroadcastEvent::UserLeavedGroup {
+                        targets: members,
+                        gid,
+                        uid: vec![uid],
+                    }));
+            }
+
+            for gid in exit_from_public_group {
+                let _ = self
+                    .event_sender
+                    .send(Arc::new(BroadcastEvent::UserLeavedGroup {
+                        targets: cache.users.keys().copied().collect(),
+                        gid,
+                        uid: vec![uid],
+                    }));
+            }
+        }
+
+        Ok(())
     }
 }
 

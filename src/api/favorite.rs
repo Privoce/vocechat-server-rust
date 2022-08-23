@@ -17,6 +17,7 @@ use crate::{
         token::Token,
         Archive, DateTime,
     },
+    middleware::guest_forbidden,
     state::State,
 };
 
@@ -45,7 +46,7 @@ pub struct ApiFavorite;
 #[OpenApi(prefix_path = "/favorite", tag = "ApiTags::Favorite")]
 impl ApiFavorite {
     /// Create favorite archive
-    #[oai(path = "/", method = "post")]
+    #[oai(path = "/", method = "post", transform = "guest_forbidden")]
     async fn create(
         &self,
         state: Data<&State>,
@@ -107,7 +108,7 @@ impl ApiFavorite {
     }
 
     /// Delete a favorite archive
-    #[oai(path = "/:id", method = "delete")]
+    #[oai(path = "/:id", method = "delete", transform = "guest_forbidden")]
     async fn delete(&self, state: Data<&State>, token: Token, id: Path<String>) -> Result<()> {
         let path = state.config.system.favorite_dir(token.uid).join(&id.0);
         if !path.exists() {

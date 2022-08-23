@@ -38,6 +38,7 @@ use crate::{
         DateTime, KickReason,
     },
     create_user::{CreateUser, CreateUserBy, CreateUserError},
+    middleware::guest_forbidden,
     state::{CacheDevice, OAuth2State, UserEvent, UserStatus},
     State,
 };
@@ -47,6 +48,7 @@ pub struct CurrentUser {
     pub uid: i64,
     pub device: String,
     pub is_admin: bool,
+    pub is_guest: bool,
 }
 
 /// ApiKey authorization
@@ -571,6 +573,17 @@ impl ApiToken {
         Ok(Json(hex::encode(&buf_sig)))
     }
 
+    /// Login as guest
+    #[oai(path = "/login_guest", method = "get")]
+    async fn login_guest(&self, state: Data<&State>) -> Result<LoginApiResponse> {
+        let name = state.cache.read().await.assign_username(None, None);
+        let (uid, _) = state
+            .create_user(CreateUser::new(&name, CreateUserBy::Guest, false))
+            .await
+            .map_err(|_| Error::from_status(StatusCode::INTERNAL_SERVER_ERROR))?;
+        do_login(&state, uid, "guest_device", None).await
+    }
+
     /// Login
     #[oai(path = "/login", method = "post")]
     async fn login(
@@ -1043,7 +1056,7 @@ impl ApiToken {
     }
 
     /// Bind credential
-    #[oai(path = "/bind", method = "post")]
+    #[oai(path = "/bind", method = "post", transform = "guest_forbidden")]
     async fn bind(
         &self,
         state: Data<&State>,
@@ -1263,12 +1276,25 @@ impl ApiToken {
             None => return Ok(LogoutApiResponse::IllegalToken),
         };
 
+        // begin transaction
+        let mut tx = state.db_pool.begin().await.map_err(InternalServerError)?;
+
         sqlx::query("delete from refresh_token where uid = ? and device = ?")
             .bind(token.uid)
             .bind(&token.device)
-            .execute(&state.db_pool)
+            .execute(&mut tx)
             .await
             .map_err(InternalServerError)?;
+
+        sqlx::query("delete from device where uid = ? and device = ?")
+            .bind(token.uid)
+            .bind(&token.device)
+            .execute(&mut tx)
+            .await
+            .map_err(InternalServerError)?;
+
+        // commit transaction
+        tx.commit().await.map_err(InternalServerError)?;
 
         // close events connection
         if let Some(sender) = cached_user
@@ -1281,11 +1307,12 @@ impl ApiToken {
             });
         }
 
+        cached_user.devices.remove(&token.device);
         Ok(LogoutApiResponse::Ok)
     }
 
     /// Update FCM device token
-    #[oai(path = "/device_token", method = "put")]
+    #[oai(path = "/device_token", method = "put", transform = "guest_forbidden")]
     async fn update_device_token(
         &self,
         state: Data<&State>,
@@ -1342,6 +1369,7 @@ pub async fn do_login(
             uid,
             device: device.to_string(),
             is_admin: cached_user.is_admin,
+            is_guest: cached_user.is_guest,
         },
         state.config.system.refresh_token_expiry_seconds,
         state.config.system.token_expiry_seconds,

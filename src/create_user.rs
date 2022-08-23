@@ -12,6 +12,7 @@ use crate::{
 
 #[derive(Debug)]
 pub enum CreateUserBy<'a> {
+    Guest,
     Password {
         email: &'a str,
         password: &'a str,
@@ -42,6 +43,7 @@ pub enum CreateUserBy<'a> {
 impl<'a> CreateUserBy<'a> {
     fn type_name(&self) -> &'static str {
         match self {
+            CreateUserBy::Guest => "guest",
             CreateUserBy::Password { .. } => "password",
             CreateUserBy::MagicLink { .. } => "magiclink",
             CreateUserBy::Google { .. } => "google",
@@ -54,6 +56,7 @@ impl<'a> CreateUserBy<'a> {
 
     fn email(&self) -> Option<&'a str> {
         match self {
+            CreateUserBy::Guest => None,
             CreateUserBy::Password { email, .. } => Some(*email),
             CreateUserBy::MagicLink { email } => Some(*email),
             CreateUserBy::Google { email } => Some(*email),
@@ -66,6 +69,7 @@ impl<'a> CreateUserBy<'a> {
 
     fn password(&self) -> Option<&'a str> {
         match self {
+            CreateUserBy::Guest => None,
             CreateUserBy::Password { password, .. } => Some(*password),
             CreateUserBy::MagicLink { .. } => None,
             CreateUserBy::Google { .. } => None,
@@ -144,6 +148,7 @@ impl State {
         let password = create_user.create_by.password();
         let language = create_user.language.cloned().unwrap_or_default();
         let mut cache = self.cache.write().await;
+        let is_guest = matches!(&create_user.create_by, CreateUserBy::Guest);
 
         // check license
         {
@@ -175,7 +180,7 @@ impl State {
         } else {
             DateTime::zero()
         };
-        let sql = "insert into user (name, password, email, gender, language, is_admin, create_by, avatar_updated_at, status, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        let sql = "insert into user (name, password, email, gender, language, is_admin, create_by, avatar_updated_at, status, created_at, updated_at, is_guest) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         let uid = sqlx::query(sql)
             .bind(create_user.name)
             .bind(password)
@@ -188,6 +193,7 @@ impl State {
             .bind(i8::from(UserStatus::Normal))
             .bind(now)
             .bind(now)
+            .bind(is_guest)
             .execute(&mut tx)
             .await
             .map_err(InternalServerError)?
@@ -253,20 +259,26 @@ impl State {
             _ => {}
         }
 
-        // insert into user_log table
-        let sql = "insert into user_log (uid, action, email, name, gender, language, avatar_updated_at) values (?, ?, ?, ?, ?, ?, ?)";
-        let log_id = sqlx::query(sql)
-            .bind(uid)
-            .bind(UpdateAction::Create)
-            .bind(email)
-            .bind(&create_user.name)
-            .bind(create_user.gender)
-            .bind(&language)
-            .bind(avatar_updated_at)
-            .execute(&mut tx)
-            .await
-            .map_err(InternalServerError)?
-            .last_insert_rowid();
+        let log_id = if !is_guest {
+            // insert into user_log table
+            let sql = "insert into user_log (uid, action, email, name, gender, language, avatar_updated_at, is_admin) values (?, ?, ?, ?, ?, ?, ?, ?)";
+            let log_id = sqlx::query(sql)
+                .bind(uid)
+                .bind(UpdateAction::Create)
+                .bind(email)
+                .bind(&create_user.name)
+                .bind(create_user.gender)
+                .bind(&language)
+                .bind(avatar_updated_at)
+                .bind(create_user.is_admin)
+                .execute(&mut tx)
+                .await
+                .map_err(InternalServerError)?
+                .last_insert_rowid();
+            Some(log_id)
+        } else {
+            None
+        };
 
         tx.commit().await.map_err(InternalServerError)?;
 
@@ -292,33 +304,36 @@ impl State {
                 read_index_user: Default::default(),
                 read_index_group: Default::default(),
                 status: UserStatus::Normal,
+                is_guest,
             },
         );
 
-        // broadcast event
-        let _ = self
-            .event_sender
-            .send(Arc::new(BroadcastEvent::UserLog(UserUpdateLog {
-                log_id,
-                action: UpdateAction::Create,
-                uid,
-                email: email.map(ToString::to_string),
-                name: Some(create_user.name.to_string()),
-                gender: create_user.gender.into(),
-                language: Some(language.clone()),
-                is_admin: Some(create_user.is_admin),
-                avatar_updated_at: Some(avatar_updated_at),
-            })));
+        if let Some(log_id) = log_id {
+            // broadcast event
+            let _ = self
+                .event_sender
+                .send(Arc::new(BroadcastEvent::UserLog(UserUpdateLog {
+                    log_id,
+                    action: UpdateAction::Create,
+                    uid,
+                    email: email.map(ToString::to_string),
+                    name: Some(create_user.name.to_string()),
+                    gender: create_user.gender.into(),
+                    language: Some(language.clone()),
+                    is_admin: Some(create_user.is_admin),
+                    avatar_updated_at: Some(avatar_updated_at),
+                })));
 
-        for (gid, group) in cache.groups.iter() {
-            if group.ty.is_public() {
-                let _ = self
-                    .event_sender
-                    .send(Arc::new(BroadcastEvent::UserJoinedGroup {
-                        targets: cache.users.keys().copied().collect(),
-                        gid: *gid,
-                        uid: vec![uid],
-                    }));
+            for (gid, group) in cache.groups.iter() {
+                if group.ty.is_public() {
+                    let _ = self
+                        .event_sender
+                        .send(Arc::new(BroadcastEvent::UserJoinedGroup {
+                            targets: cache.users.keys().copied().collect(),
+                            gid: *gid,
+                            uid: vec![uid],
+                        }));
+                }
             }
         }
 

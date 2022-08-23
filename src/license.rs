@@ -96,7 +96,7 @@ pub async fn check_license(state: &State, req: &Request) -> Result<()> {
 #[macro_export]
 macro_rules! check_license_wrap {
     ($($tt: expr),*) => {
-        crate::license::check_license($($tt),*).await.map_err(|err| Error::from_string(err.to_string(), StatusCode::UNAVAILABLE_FOR_LEGAL_REASONS))?;
+        $crate::license::check_license($($tt),*).await.map_err(|err| Error::from_string(err.to_string(), StatusCode::UNAVAILABLE_FOR_LEGAL_REASONS))?;
     }
 }
 pub(crate) use check_license_wrap;

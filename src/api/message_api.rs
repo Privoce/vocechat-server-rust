@@ -16,6 +16,7 @@ use crate::{
         token::Token,
         ChatMessagePayload, DateTime, MessageTarget, MessageTargetGroup, MessageTargetUser,
     },
+    middleware::guest_forbidden,
     State,
 };
 
@@ -41,7 +42,7 @@ enum ReactionApiResponse {
 #[OpenApi(prefix_path = "/message", tag = "ApiTags::Message")]
 impl ApiMessage {
     /// Edit message
-    #[oai(path = "/:mid/edit", method = "put")]
+    #[oai(path = "/:mid/edit", method = "put", transform = "guest_forbidden")]
     async fn edit(
         &self,
         state: Data<&State>,
@@ -62,7 +63,7 @@ impl ApiMessage {
     }
 
     /// Edit message
-    #[oai(path = "/:mid/like", method = "put")]
+    #[oai(path = "/:mid/like", method = "put", transform = "guest_forbidden")]
     async fn like(
         &self,
         state: Data<&State>,
@@ -81,7 +82,7 @@ impl ApiMessage {
     }
 
     /// Delete message
-    #[oai(path = "/:mid", method = "delete")]
+    #[oai(path = "/:mid", method = "delete", transform = "guest_forbidden")]
     async fn delete(
         &self,
         state: Data<&State>,
@@ -98,7 +99,7 @@ impl ApiMessage {
     }
 
     /// Reply message
-    #[oai(path = "/:mid/reply", method = "post")]
+    #[oai(path = "/:mid/reply", method = "post", transform = "guest_forbidden")]
     async fn reply(
         &self,
         state: Data<&State>,
