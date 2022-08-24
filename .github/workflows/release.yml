@@ -89,8 +89,8 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 384878476649.dkr.ecr.us-east-1.amazonaws.com
           docker build --platform linux/amd64 -t 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:latest .
           docker push 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:latest
-          docker build --platform linux/amd64 -t 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:${{ github.ref_name}} .
-          docker push 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:${{ github.ref_name}}
+          docker build --platform linux/amd64 -t 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-server:${{ github.ref_name}} .
+          docker push 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-server:${{ github.ref_name}}
       - if: matrix.target == 'aarch64-unknown-linux-musl'
         run: |
           docker -v
