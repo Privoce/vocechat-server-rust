@@ -50,7 +50,7 @@ jobs:
           key: ${{ secrets.NEW_GEN_ACTIONS_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VOCECHAT_COM_HOST }}
       - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.VOCECHAT_COM_HOST }} >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H "${{ secrets.VOCECHAT_COM_HOST }}" >> ~/.ssh/known_hosts
       - name: Install rsync
         run: ${{ matrix.pre_install }}
       - uses: actions-rs/toolchain@v1
