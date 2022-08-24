@@ -65,6 +65,12 @@ jobs:
       - run: |
           cp target/${{ matrix.target }}/release/vocechat-server ./vocechat-server
           zip -r ./vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip ./vocechat-server config
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
       - if: matrix.target == 'x86_64-unknown-linux-musl'
         run: |
           docker -v
@@ -80,6 +86,11 @@ jobs:
           docker build -t vocechat-server:${{ github.ref_name}} .
           docker tag vocechat-server:${{ github.ref_name}} privoce/vocechat-server:${{ github.ref_name}}
           docker push privoce/vocechat-server:${{ github.ref_name}}
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 384878476649.dkr.ecr.us-east-1.amazonaws.com
+          docker build --platform linux/amd64 -t 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:latest .
+          docker push 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:latest
+          docker build --platform linux/amd64 -t 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:${{ github.ref_name}} .
+          docker push 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-rust:${{ github.ref_name}}
       - if: matrix.target == 'aarch64-unknown-linux-musl'
         run: |
           docker -v
