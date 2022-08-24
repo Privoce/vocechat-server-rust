@@ -43,7 +43,7 @@ Schematic & Commands:
 ```bash
 mkdir -p ~/.vocechat-server/data
 docker run -d --restart=always \
-  -p 443:443 \
+  -p 443:3000 \
   --name vocechat-server \
   -v ~/.vocechat-server/data:/home/vocechat-server/data \
   Privoce/vocechat-server:latest \
