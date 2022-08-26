@@ -29,6 +29,9 @@ pub struct LoginConfig {
     /// Who can sign up
     #[serde(default = "default_who_can_sign_up")]
     pub who_can_sign_up: WhoCanSignUp,
+    /// Login as guest
+    #[serde(default)]
+    pub guest: bool,
     /// Login with password
     #[serde(default)]
     pub password: bool,
@@ -60,6 +63,7 @@ impl Default for LoginConfig {
     fn default() -> Self {
         Self {
             who_can_sign_up: WhoCanSignUp::EveryOne,
+            guest: false,
             password: true,
             magic_link: true,
             google: false,

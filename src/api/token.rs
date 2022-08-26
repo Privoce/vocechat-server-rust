@@ -576,6 +576,14 @@ impl ApiToken {
     /// Login as guest
     #[oai(path = "/login_guest", method = "get")]
     async fn login_guest(&self, state: Data<&State>) -> Result<LoginApiResponse> {
+        let login_cfg = state
+            .get_dynamic_config_instance::<LoginConfig>()
+            .await
+            .unwrap_or_default();
+        if !login_cfg.guest {
+            return Err(Error::from_status(StatusCode::FORBIDDEN));
+        }
+
         let name = state.cache.read().await.assign_username(None, None);
         let (uid, _) = state
             .create_user(CreateUser::new(&name, CreateUserBy::Guest, false))
