@@ -1452,7 +1452,7 @@ impl ApiUser {
     }
 
     /// Delete current user
-    #[oai(path = "/delete", method = "get")]
+    #[oai(path = "/delete", method = "delete")]
     async fn delete_current_user(&self, state: Data<&State>, token: Token) -> Result<()> {
         state.delete_user(token.uid).await?;
         Ok(())
