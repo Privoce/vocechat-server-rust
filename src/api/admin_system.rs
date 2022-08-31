@@ -133,7 +133,7 @@ impl ApiAdminSystem {
 
         let cache = state.cache.read().await;
         Ok(Json(Metrics {
-            user_count: cache.users.len(),
+            user_count: cache.users.iter().filter(|user| !user.1.is_guest).count(),
             group_count: cache.groups.len(),
             online_user_count: cache.users.values().filter(|user| user.is_online()).count(),
             version: env!("CARGO_PKG_VERSION").to_string(),
