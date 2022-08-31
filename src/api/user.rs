@@ -1639,7 +1639,7 @@ fn create_user_event_receiver(
         let (tx_user_event, rx_user_event) = mpsc::unbounded_channel();
         device.sender = Some(tx_user_event);
 
-        if !is_online && user.is_online() {
+        if !is_online && user.is_online() && !user.is_guest {
             let _ = state
                 .event_sender
                 .send(Arc::new(BroadcastEvent::UserStateChanged(
@@ -1820,7 +1820,7 @@ async fn events_loop(
         if let Some(device) = user.devices.get_mut(&current_device) {
             device.sender = None;
         }
-        if !user.is_online() {
+        if !user.is_online() && !user.is_guest {
             let _ = state
                 .event_sender
                 .send(Arc::new(BroadcastEvent::UserStateChanged(
