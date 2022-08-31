@@ -1523,6 +1523,7 @@ async fn fetch_user_log(
             let users = cache
                 .users
                 .iter()
+                .filter(|user| !user.1.is_guest)
                 .map(|(uid, user)| user.api_user_info(*uid))
                 .collect_vec();
             if !users.is_empty() {
