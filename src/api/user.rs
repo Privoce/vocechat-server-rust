@@ -886,6 +886,7 @@ impl ApiUser {
                 .await
                 .users
                 .iter()
+                .filter(|(_, user)| !user.is_guest)
                 .map(|(id, user)| user.api_user_info(*id))
                 .collect(),
         )
