@@ -87,7 +87,13 @@ pub async fn check_license(state: &State, req: &Request) -> Result<()> {
         return Err(anyhow::anyhow!("License error: Sign invalid."));
     }
     let cache = state.cache.read().await;
-    if cache.users.len() > license.user_limit as usize {
+    if cache
+        .users
+        .iter()
+        .filter(|(_, user)| !user.is_guest)
+        .count()
+        > license.user_limit as usize
+    {
         return Err(anyhow::anyhow!("License error: Users reached limit."));
     }
     Ok(())

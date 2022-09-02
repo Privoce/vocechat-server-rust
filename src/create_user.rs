@@ -152,7 +152,13 @@ impl State {
 
         // check license
         {
-            if cache.users.len() >= crate::license::G_LICENSE.lock().await.user_limit as usize {
+            if cache
+                .users
+                .iter()
+                .filter(|(_, user)| !user.is_guest)
+                .count()
+                >= crate::license::G_LICENSE.lock().await.user_limit as usize
+            {
                 return Err(CreateUserError::PoemError(poem::Error::from_string(
                     "License error: Users reached limit.",
                     StatusCode::UNAVAILABLE_FOR_LEGAL_REASONS,

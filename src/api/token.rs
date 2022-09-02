@@ -588,7 +588,9 @@ impl ApiToken {
         let (uid, _) = state
             .create_user(CreateUser::new(&name, CreateUserBy::Guest, false))
             .await
-            .map_err(|_| Error::from_status(StatusCode::INTERNAL_SERVER_ERROR))?;
+            .map_err(|err| {
+                Error::from_string(format!("{:?}", err), StatusCode::INTERNAL_SERVER_ERROR)
+            })?;
         do_login(&state, uid, "guest_device", None).await
     }
 
