@@ -393,6 +393,7 @@ async fn update_webclient(state: &State) {
         return;
     }
 
+    let _ = std::fs::remove_dir_all(&wwwroot_dir);
     let _ = std::fs::rename(temp_wwwroot_dir, wwwroot_dir);
     tracing::info!("web client updated");
 }
