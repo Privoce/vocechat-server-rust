@@ -6,6 +6,7 @@
       - [With Nginx](install-by-docker-nginx.md)
     - [Shell](install-by-shell.md)
     - [Source Code](install-by-source.md)
+- [iframe Embed](iframe-embed.md)
 - [SSL Configuration]()
     - [Don't have your own Certificate](ssl-no-ca.md)
     - [Have your own Certificate](ssl-have-ca.md)
