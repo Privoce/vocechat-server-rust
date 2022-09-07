@@ -1,6 +1,6 @@
 ## Iframe Embed
 
-If the 80/443 port is occupied by nginx, please refer to [Nginx Reverse proxy](https://doc.voce.chat/en-us/install-by-docker-nginx.html)
+Iframe embed a VoceChat at anywhere, ususally on your own website.
 
 All you need is iframe, change src to your VoceChat domain，e.g., `privoce.voce.chat` is our embedded space on our official website: [https://voce.chat](https://voce.chat), and the exmaple `code` is here:
 
@@ -11,3 +11,5 @@ All you need is iframe, change src to your VoceChat domain，e.g., `privoce.voce
       <!-- width and height can be changed by you，but we recommend using CSS to control it -->
 }
 ```
+
+See the live embed example on [jsfiddle](https://jsfiddle.net/ao9rqed1/) or on our [official website](https://voce.chat/)
