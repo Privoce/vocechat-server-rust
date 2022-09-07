@@ -13,3 +13,5 @@ All you need is iframe, change src to your VoceChat domain，e.g., `privoce.voce
 ```
 
 See the live embed example on [jsfiddle](https://jsfiddle.net/ao9rqed1/) or on our [official website](https://voce.chat/)
+
+Also, you may want to enabled **Guest Mode** for site visitors to see public channel discussions, see [how to enable guest mode](server-access-control.md).
