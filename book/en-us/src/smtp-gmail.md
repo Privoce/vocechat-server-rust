@@ -10,4 +10,4 @@ With vocechat-server launched, visit your vocechat domain (http://localhost:3000
 2. Enable "Less secure app access"
    > Less Secure Apps (Admin Side): https://admin.google.com/ac/security/lsa  
    > Less Secure Apps (Inbox Side): https://myaccount.google.com/lesssecureapps?pli=1
-3. ![smtp-gmail.jpg](image/smtp-gmail.jpg)
+
