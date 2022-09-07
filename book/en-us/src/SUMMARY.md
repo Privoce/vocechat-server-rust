@@ -13,6 +13,7 @@
     - [Apply for Certificate Manually]()
       - [Godaddy](godaddy-ca.md)
 - [Settings]()
+    - [Server Access Control--Sign up, Guest Mode](server-access-control.md)
     - [Firebase & Notification](setting-firebase-notification.md)
     - [SMTP]()
         - [Gmail](smtp-gmail.md)
