@@ -10,4 +10,4 @@ At settings, the 1st section is Overview, and that's where you can set up the **
     - Enabled
     - Disabled
 
-Guest mode is usually enabled in iframe embed under your site, so that site visitors can directly see your public channel content.
+Guest mode is usually enabled in [iframe embed](iframe-embed.md) under your site, so that site visitors can directly see your public channel content.
