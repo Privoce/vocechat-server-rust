@@ -15,12 +15,12 @@ The core members include 'MIT' alumni, 'Stanford' entrepreneurial organization m
 Vocechat is an open-source product with a free community version and only charges for business usages. You are welcome to star, raise issues, and contribute in any form.
 
 ### Project composition:
-| Name     | Tech    | Project                                                         | License | Comment                                             |
+| Name     | Stack    | URL                                                         | Open Sourced | Comment                                             |
 |----------|---------|-----------------------------------------------------------------|---------|-----------------------------------------------------|
-| Server:  | Rust    | [vocechat-server](https://github.com/privoce/vocechat-server)   | TBD     | Server Supports platforms: Linux, Windows, Arm32/64 |
-| Client:  | Flutter | [vocechat-client](https://github.com/privoce/vocechat-client)   | ---     | Client supports Android and IOS platforms           |
-| Web:     | React   | [vocechat-web](https://github.com/privoce/vocechat-web)         | ---     | Web App, integrated management                      |
-| Web-SDK: | React   | [vocechat-web-sdk](https://github.com/privoce/vocechat-web-sdk) | ---     | JS-SDK Can be intergrated into other products.      |
+| Server:  | Rust    | [docker image](https://hub.docker.com/r/privoce/vocechat-server/tags)   | TBD     | Server Supports platforms: Linux, Windows, Arm32/64 |
+| Client:  | Flutter | [coming soon](https://github.com/privoce/vocechat-client)   | Yes     | Client supports Android and IOS platforms           |
+| Web:     | React   | [vocechat-web](https://github.com/privoce/vocechat-web)         | Yes     | Web App, integrated management                      |
+| Web-SDK: | React   | [coming soon](https://github.com/privoce/vocechat-web-sdk) | Yes     | JS-SDK Can be intergrated into other products.      |
 
 ### Feature List & Roadmap
 - [x] DM & Group Chating / 2021-Q4
