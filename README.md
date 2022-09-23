@@ -186,8 +186,8 @@ view: http://localhost:3000/
     <tr align="center">
         <th align="left">Signal</th>
         <td>✅</td>
-        <td>❌</td>
-        <td>❌</td>
+        <td>✅</td>
+        <td>✅</td>
         <td>❌</td>
         <td>✅</td>
         <td>✅</td>
@@ -209,7 +209,7 @@ view: http://localhost:3000/
         <th align="left">Telegram</th>
         <td>✅</td>
         <td>✅</td>
-        <td>❌</td>
+        <td>✅</td>
         <td>❌</td>
         <td>✅</td>
         <td>✅</td>
