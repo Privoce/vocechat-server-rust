@@ -1,7 +1,7 @@
 # Grand Goal
 The grand goal of Voce is to provide a space owned by "you" on the Internet, just as the name "voce" means in portguese. As cloud computing is getting matured, there will be a time in the foreseeable future that netizens like you and me can enjoy the benefit of having a personal cloud space on the Internet. 
 
-Why do we need a private cloud space? The short answer is that information will become our private property and and communication means will be under the control of every netizen. 
+Why do we need a private cloud space? The short answer is that information will become our private property and means of communication will be under the control of every netizen. 
 
 Digital technologies including Internet and the Web make information duplicable and transferable, yet platforms are controlling the ownership and means of production and transmission of most information (content) on the Internet. We are building Voce as an open-sourced tool (not a platform) to empower smaller groups and individuals to become a platform themselves. When various servers get connected to each other, all the information shared among the servers will be duplicated and become the server owner's private data under private storages. 
 
@@ -9,8 +9,10 @@ Digital technologies including Internet and the Web make information duplicable 
 # Why Rust
 Rust written server is only 15MB and runs with great efficiency, which means hosting a private social media server can become an individual thing, no matter where it is hosted--on your public cloud server, personal NAS or Raspberry Pi, etc. Just like cars v. public transportation, or single family home v. hotels, private social media is more personalized and all data is owned by the owner, so that there could be a new paradigm of private social media along with today's central social media platforms--if Facebook is a hotel, then Voce is like a house. However, private social media is not free--just like lands and houses are not free.
 
-# How to get interconnected (Unsolved)
-Private social media cannot always stay private if people want new information to be transferred among different servers. "Social" means multiple nodes communicate with multiple nodes in a synced space. A channel (private or public) should serve this ends. Each channel should function like a "shared ledger" where members who joined should have the right to use their server to store the data. Matrix.org has provided a standard exactly solving this multi-server data storage needs. Hence a support for matrix is desirable in the next steps. 
+# How to get interconnected (Work in progress, welcome your contribution!)
+Private social media cannot always stay private if people want new information to be transferred among different servers. "Social" means multiple nodes communicate with multiple nodes in a synced space. A channel (private or public) should serve this ends. Each channel should function like a "shared ledger" where members who joined should have the right to use their server to store the data--this functions like Bitcoin yet in the chat channel settings, efficienty should be more prioritiezed and trust does not necessarily come evenly from everynode (admin of the channel has super power should be allowed). In terms of data sync in a channel, compared with blockchain, git is a more proper solution. Matrix.org has provided a standard exactly solving this multi-server data storage needs. Hence a support for matrix is desirable in the next steps. 
+
+If any fellow netizens have better proposals on how multiple servers should get interconnected, please share and discuss it with us here.
 
 
 # VoceChat Intro
