@@ -1,5 +1,5 @@
 # VoceChat Intro
-`Vocechat` is a secure chat software that supports independent deployment.
+`Vocechat` is a secure community chat social media that supports independent deployment.
 The data is completely controlled by the user.
 It supports the whole process of encrypted transmission and can be burned immediately after reading.
 The function is inspired by products and specifications such as `Slack`, `Discord`, `RocketChat`, `Matrix` and `Solid`.
@@ -11,7 +11,6 @@ Therefore, Vocechat is created and positioned as a social collaboration program 
 
 The team is internationalized and cooperates remotely.
 The contributors come from North America, South America, Asia and Africa.
-The core members include 'MIT' alumni, 'Stanford' entrepreneurial organization members, top developers and open-source veterans.
 Vocechat is an open-source product with a free community version and only charges for business usages. You are welcome to star, raise issues, and contribute in any form.
 
 ### Project composition:
