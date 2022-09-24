@@ -132,7 +132,7 @@ mod tests {
             json.value().object().get("domains").string_array()[0],
             "www.domain.com"
         );
-        assert_eq!(json.value().object().get("sign").bool(), true);
+        assert!(json.value().object().get("sign").bool());
 
         let server = TestServer::new().await;
         let resp = server
@@ -191,9 +191,9 @@ mod tests {
         // test sign invalid
         let server = TestServer::new().await;
         let state = server.state();
-        crate::license::load_license(&state).await.unwrap();
+        crate::license::load_license(state).await.unwrap();
         let invalid_sign_license = "Jym9MkwzuPBfKKPkYVKJfGeGVbpx8pHeWrLM5zPNoSf3GrrwNCowRGgowUX2LULLzMpdLUcSvrHTHLpYRhKDc5JFyPVNqoKxiWfcCwGzn";
-        crate::license::update_license(&state, invalid_sign_license)
+        crate::license::update_license(state, invalid_sign_license)
             .await
             .unwrap();
         let resp = server
@@ -210,9 +210,9 @@ mod tests {
         // test sign invalid
         let server = TestServer::new().await;
         let state = server.state();
-        crate::license::load_license(&state).await.unwrap();
+        crate::license::load_license(state).await.unwrap();
         let invalid_sign_license = "Jym9MkwzuPBfKKPkYVKJfGeGVbpx8pHeWrLM5zPNoSf3GrrwNCowRGgowUX2LULLzMpdLUcSvrHTHLpYRhKDc5JFyPVNqoKxiWfcCwGzn";
-        crate::license::update_license(&state, invalid_sign_license)
+        crate::license::update_license(state, invalid_sign_license)
             .await
             .unwrap();
         let resp = server

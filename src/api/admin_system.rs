@@ -15,6 +15,7 @@ use crate::{
     state::{send_mail, DynamicConfig, DynamicConfigEntry},
     State,
 };
+use poem_openapi::types::Email;
 
 /// Server metrics
 #[derive(Debug, Object)]
@@ -68,7 +69,7 @@ struct SendMailRequest {
 
 #[derive(Object)]
 struct CreateAdminRequest {
-    email: String,
+    email: Email,
     name: String,
     password: String,
     gender: i32,

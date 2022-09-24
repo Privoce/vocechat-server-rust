@@ -400,6 +400,7 @@ pub struct GroupChangedMessage {
     pub description: Option<String>,
     pub owner: Option<i64>,
     pub avatar_updated_at: Option<DateTime>,
+    pub is_public: Option<bool>,
 }
 
 /// Pinned message updated

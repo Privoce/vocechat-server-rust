@@ -31,7 +31,7 @@ use crate::{
         MessageTarget,
     },
     middleware::guest_forbidden,
-    state::{BroadcastEvent, CacheGroup, GroupType},
+    state::{BroadcastEvent, Cache, CacheGroup, GroupType},
     State,
 };
 
@@ -41,6 +41,12 @@ struct UpdateGroupRequest {
     name: Option<String>,
     description: Option<String>,
     owner: Option<i64>,
+}
+
+/// Change group type request
+#[derive(Debug, Object)]
+struct ChangeGroupTypeRequest {
+    is_public: bool,
 }
 
 impl UpdateGroupRequest {
@@ -292,6 +298,7 @@ impl ApiGroup {
                     description: None,
                     owner: None,
                     avatar_updated_at: Some(now),
+                    is_public: None,
                 },
             }));
 
@@ -424,6 +431,7 @@ impl ApiGroup {
             description: None,
             owner: None,
             avatar_updated_at: None,
+            is_public: None,
         };
 
         // update cache
@@ -453,6 +461,147 @@ impl ApiGroup {
                 },
                 msg: broadcast_event,
             }));
+
+        Ok(())
+    }
+
+    #[oai(path = "/:gid/change_type", method = "post")]
+    async fn change_type(
+        &self,
+        state: Data<&State>,
+        token: Token,
+        gid: Path<i64>,
+        req: Json<ChangeGroupTypeRequest>,
+    ) -> Result<()> {
+        let mut cache = state.cache.write().await;
+        let Cache { groups, users, .. } = &mut *cache;
+        let group = match groups.get_mut(&gid.0) {
+            Some(group) => group,
+            None => return Err(Error::from_status(StatusCode::NOT_FOUND)),
+        };
+
+        match group.ty {
+            GroupType::Public if !token.is_admin => {
+                return Err(Error::from_status(StatusCode::FORBIDDEN));
+            }
+            GroupType::Private { owner } if owner != token.uid && !token.is_admin => {
+                return Err(Error::from_status(StatusCode::FORBIDDEN));
+            }
+            _ => {}
+        }
+
+        let mut tx = state.db_pool.begin().await.map_err(InternalServerError)?;
+
+        match (group.ty.is_public(), req.is_public) {
+            (true, false) => {
+                // public to private
+                sqlx::query("update `group` set is_public = ?, owner = ? where gid = ?")
+                    .bind(false)
+                    .bind(token.uid)
+                    .bind(gid.0)
+                    .execute(&mut tx)
+                    .await
+                    .map_err(InternalServerError)?;
+
+                for uid in users
+                    .iter()
+                    .filter(|(_, user)| !user.is_guest)
+                    .map(|(id, _)| *id)
+                {
+                    sqlx::query("insert into group_user (gid, uid) values (?, ?)")
+                        .bind(gid.0)
+                        .bind(uid)
+                        .execute(&mut tx)
+                        .await
+                        .map_err(InternalServerError)?;
+                }
+            }
+            (false, true) => {
+                // private to public
+                sqlx::query("update `group` set is_public = ?, owner = ? where gid = ?")
+                    .bind(true)
+                    .bind(None::<i32>)
+                    .bind(gid.0)
+                    .execute(&mut tx)
+                    .await
+                    .map_err(InternalServerError)?;
+
+                sqlx::query("delete from group_user where gid = ?")
+                    .bind(gid.0)
+                    .execute(&mut tx)
+                    .await
+                    .map_err(InternalServerError)?;
+            }
+            _ => {}
+        }
+
+        tx.commit().await.map_err(InternalServerError)?;
+
+        // update cache
+        match (group.ty.is_public(), req.is_public) {
+            (true, false) => {
+                group.ty = GroupType::Private { owner: token.uid };
+                group.members = users
+                    .iter()
+                    .filter(|(_, user)| !user.is_guest)
+                    .map(|(id, _)| *id)
+                    .collect();
+
+                let _ = state
+                    .event_sender
+                    .send(Arc::new(BroadcastEvent::GroupChanged {
+                        targets: users.keys().copied().collect(),
+                        msg: GroupChangedMessage {
+                            gid: gid.0,
+                            name: None,
+                            description: None,
+                            owner: Some(gid.0),
+                            avatar_updated_at: None,
+                            is_public: Some(false),
+                        },
+                    }));
+            }
+            (false, true) => {
+                let origin_members = std::mem::take(&mut group.members);
+                let all_users = users.keys().copied().collect::<BTreeSet<_>>();
+                let new_members = all_users
+                    .difference(&origin_members)
+                    .copied()
+                    .collect::<BTreeSet<_>>();
+
+                group.ty = GroupType::Public;
+
+                let _ = state
+                    .event_sender
+                    .send(Arc::new(BroadcastEvent::GroupChanged {
+                        targets: users.keys().copied().collect(),
+                        msg: GroupChangedMessage {
+                            gid: gid.0,
+                            name: None,
+                            description: None,
+                            owner: None,
+                            avatar_updated_at: None,
+                            is_public: Some(true),
+                        },
+                    }));
+
+                let _ = state
+                    .event_sender
+                    .send(Arc::new(BroadcastEvent::UserJoinedGroup {
+                        targets: origin_members,
+                        gid: gid.0,
+                        uid: new_members.iter().copied().collect(),
+                    }));
+
+                let _ = state
+                    .event_sender
+                    .send(Arc::new(BroadcastEvent::JoinedGroup {
+                        targets: new_members,
+                        group: group.api_group(gid.0),
+                    }));
+            }
+            _ => {}
+        }
 
         Ok(())
     }

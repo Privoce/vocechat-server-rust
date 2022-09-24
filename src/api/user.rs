@@ -269,7 +269,7 @@ pub enum RegisterUserResponse {
 #[derive(Debug, Object)]
 struct SendRegMagicTokenRequest {
     magic_token: String,
-    email: String,
+    email: Email,
     password: String,
 }
 
@@ -509,7 +509,7 @@ impl ApiUser {
                     expired_at,
                     true,
                     gid,
-                    Some(post.email.clone()),
+                    Some(post.email.0.clone()),
                     Some(post.password.clone()),
                 ),
                 gid,
@@ -525,7 +525,7 @@ impl ApiUser {
                     expired_at,
                     true,
                     gid,
-                    Some(post.email.clone()),
+                    Some(post.email.0.clone()),
                     Some(post.password.clone()),
                 ),
                 gid,
@@ -556,7 +556,7 @@ impl ApiUser {
                 .template
                 .render(&liquid::object!({
                     "magic_token": &new_magic_token,
-                    "email": email,
+                    "email": email.0,
                     "gid": gid,
                     "url": url,
                 }))
@@ -2102,7 +2102,7 @@ mod tests {
         // create user1
         let uid1 = server.create_user(&admin_token, "user1@voce.chat").await;
         let token1 = server.login("user1@voce.chat").await;
-        let mut events1 = server.subscribe_events(&token1, Some(&*filters)).await;
+        let mut events1 = server.subscribe_events(&token1, Some(filters)).await;
 
         let json = events1.next().await.unwrap();
         json.value()
@@ -2259,7 +2259,7 @@ mod tests {
         // create user3
         let uid3 = server.create_user(&admin_token, "user3@voce.chat").await;
         let token3 = server.login("user3@voce.chat").await;
-        let mut events3 = server.subscribe_events(&token3, Some(&*filters)).await;
+        let mut events3 = server.subscribe_events(&token3, Some(filters)).await;
 
         let json = events3.next().await.unwrap();
         json.value()
@@ -2337,7 +2337,7 @@ mod tests {
 
         // skip snapshot
         let mut events3 = server
-            .subscribe_events_with_users_version(&token3, Some(&*filters), 3)
+            .subscribe_events_with_users_version(&token3, Some(filters), 3)
             .await;
         let json = events3.next().await.unwrap();
         json.value().object().get("type").assert_string("users_log");

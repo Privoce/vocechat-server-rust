@@ -183,7 +183,7 @@ mod test {
         assert_eq!(license.domains[1], "www.domain2.com");
         assert_eq!(license.expired_at, expired_at);
         let b = licensegen.check(&license.to_string());
-        assert_eq!(b.is_ok(), true);
+        assert!(b.is_ok());
     }
 
     #[test]

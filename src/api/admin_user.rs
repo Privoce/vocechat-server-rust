@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use itertools::Itertools;
 use poem::{error::InternalServerError, http::StatusCode, web::Data, Error, Result};
-use poem_openapi::{param::Path, payload::Json, Object, OpenApi};
+use poem_openapi::{param::Path, payload::Json, types::Email, Object, OpenApi};
 
 use crate::{
     api::{
@@ -27,7 +27,7 @@ pub struct UserDevice {
 /// Create user request
 #[derive(Debug, Object)]
 pub struct CreateUserRequest {
-    pub email: String,
+    pub email: Email,
     pub password: String,
     #[oai(validator(max_length = 32))]
     pub name: String,
@@ -90,12 +90,13 @@ impl ApiAdminUser {
         &self,
         state: Data<&State>,
         token: Token,
-        req: Json<CreateUserRequest>,
+        mut req: Json<CreateUserRequest>,
     ) -> Result<CreateUserResponse<User>> {
         if !token.is_admin {
             return Err(Error::from_status(StatusCode::FORBIDDEN));
         }
 
+        req.email.0 = req.email.0.to_lowercase();
         let create_user = CreateUser::new(
             &req.name,
             CreateUserBy::Password {

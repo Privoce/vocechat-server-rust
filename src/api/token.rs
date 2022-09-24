@@ -645,6 +645,7 @@ impl ApiToken {
             LoginCredential::Password(LoginCredentialPassword { email, password })
                 if login_cfg.password =>
             {
+                let email = email.to_lowercase();
                 let cache = state.cache.read().await;
                 let uid = match cache
                     .users
@@ -1085,6 +1086,7 @@ impl ApiToken {
                 }
                 match parse_google_id_token(&id_token.id_token).await {
                     Ok(GoogleIdTokenPayload { email, .. }) => {
+                        let email = email.to_lowercase();
                         let sql = "insert into google_auth (email, uid) values (?, ?)";
                         sqlx::query(sql)
                             .bind(email)

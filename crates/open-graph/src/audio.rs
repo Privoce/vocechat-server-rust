@@ -1,4 +1,4 @@
-#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 #[cfg(feature = "poem_openapi")]
 #[derive(poem_openapi::Object)]
 pub struct Audio {

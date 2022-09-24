@@ -75,6 +75,7 @@ impl TestServer {
                 enabled: true,
                 config: LoginConfig {
                     who_can_sign_up: WhoCanSignUp::EveryOne,
+                    guest: true,
                     password: true,
                     magic_link: true,
                     google: true,
