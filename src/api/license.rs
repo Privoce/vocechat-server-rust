@@ -84,7 +84,7 @@ impl ApiLicense {
 
     /// Get the license
     #[oai(path = "/", method = "get")]
-    async fn get(&self, state: Data<&State>, token: Token) -> Result<Json<LicenseReply>> {
+    async fn get(&self, state: Data<&State>) -> Result<Json<LicenseReply>> {
         let mut license_path = state.config.system.data_dir.clone();
         license_path.push("license");
         let license_bs58 = tokio::fs::read_to_string(license_path)
