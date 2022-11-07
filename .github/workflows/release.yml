@@ -3,9 +3,9 @@ name: Release
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - "v[0-9]+.[0-9]+.[0-9]+"
     branches-ignore:
-      - 'main'
+      - "main"
 env:
   CARGO_TERM_COLOR: always
 
@@ -25,12 +25,12 @@ jobs:
             rust: stable
             target: x86_64-apple-darwin
             pre_install: brew install rsync
-#          - build: macos-arm
-#            os: macos-latest
-#            rust: stable
-#            target: aarch64-apple-darwin
-#            cross: true
-#            pre_install: brew install rsync
+          #          - build: macos-arm
+          #            os: macos-latest
+          #            rust: stable
+          #            target: aarch64-apple-darwin
+          #            cross: true
+          #            pre_install: brew install rsync
           - build: arm-v7
             os: ubuntu-latest
             rust: stable
@@ -106,7 +106,7 @@ jobs:
           docker build -t vocechat-server:${{ github.ref_name}}-arm64 .
           docker tag vocechat-server:${{ github.ref_name}}-arm64 privoce/vocechat-server:${{ github.ref_name}}-arm64
           docker push privoce/vocechat-server:${{ github.ref_name}}-arm64
-      - name: rsync to sh.voce.chat
+      - name: rsync to s.voce.chat
         run: |
           rsync -av vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip root@${{ secrets.VOCECHAT_COM_HOST }}:/home/wwwroot/sh.voce.chat/vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
       - name: Upload Artifact
@@ -120,12 +120,12 @@ jobs:
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-#      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
-#        with:
-#          delete_release: true
-#          tag_name: ${{ github.ref_name }}
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
+      #      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      #        with:
+      #          delete_release: true
+      #          tag_name: ${{ github.ref_name }}
+      #        env:
+      #          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
       - uses: actions/checkout@v2
       - name: Create Release
         id: create_release
@@ -139,7 +139,7 @@ jobs:
           prerelease: false
   add:
     runs-on: ubuntu-latest
-    needs: [ build, release ]
+    needs: [build, release]
     strategy:
       matrix:
         include:
@@ -151,12 +151,12 @@ jobs:
             os: macos-latest
             rust: stable
             target: x86_64-apple-darwin
-#          - build: macos-arm
-#            os: macos-latest
-#            rust: stable
-#            target: aarch64-apple-darwin
-#            cross: true
-#            pre_install: brew install rsync
+          #          - build: macos-arm
+          #            os: macos-latest
+          #            rust: stable
+          #            target: aarch64-apple-darwin
+          #            cross: true
+          #            pre_install: brew install rsync
           - build: arm-v7
             os: ubuntu-latest
             rust: stable
@@ -182,4 +182,3 @@ jobs:
           asset_path: ./vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
           asset_name: vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
           asset_content_type: application/zip
-          
