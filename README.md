@@ -34,12 +34,12 @@ Vocechat is an open-source product with a free community version and only charge
 
 ### Project composition:
 
-| Name     | Tech    | Project                                                         | License | Comment                                             |
-| -------- | ------- | --------------------------------------------------------------- | ------- | --------------------------------------------------- |
-| Server:  | Rust    | [vocechat-server](https://github.com/privoce/voce-server)       | GPLv3   | Server Supports platforms: Linux, Windows, Arm32/64 |
-| Client:  | Flutter | [vocechat-client](https://github.com/privoce/voce-client)       | ---     | Client supports Android and IOS platforms           |
-| Web:     | React   | [vocechat-web](https://github.com/privoce/vocechat-web)         | ---     | Web App, integrated management                      |
-| Web-SDK: | React   | [vocechat-web-sdk](https://github.com/privoce/vocechat-web-sdk) | ---     | JS-SDK Can be intergrated into other products.      |
+| Name       | Tech                                | Project                                                   | License | Comment                                             |
+| ---------- | ----------------------------------- | --------------------------------------------------------- | ------- | --------------------------------------------------- |
+| Server     | Rust                                | [vocechat-server](https://github.com/privoce/voce-server) | GPLv3   | Server Supports platforms: Linux, Windows, Arm32/64 |
+| APP Client | Flutter                             | [vocechat-client](https://github.com/privoce/voce-client) | ---     | Client supports Android and IOS platforms           |
+| Web Client | React                               | [vocechat-web](https://github.com/privoce/vocechat-web)   | ---     | Web App, integrated management                      |
+| Document   | [docusaurus](https://docusaurus.io) | [vocechat-doc](https://github.com/privoce/vocechat-doc)   | ---     | Vocechat document website                           |
 
 ### Feature List & Roadmap
 
@@ -50,8 +50,8 @@ Vocechat is an open-source product with a free community version and only charge
 - [x] Forward / 2022-Q1
 - [x] Favorate / 2022-Q1
 - [x] Burn after reading / 2022-Q2
-- [ ] Voice / 2022-Q3
-- [ ] Video / 2022-Q3
+- [ ] Voice / 2022-Q4
+- [ ] Video / 2022-Q4
 
 ### Quickly run
 
