@@ -192,7 +192,7 @@ esac
 echo -e "Detected platform: \033[31m$PLATFORM\033[0m."
 
 BIN_NAME="vocechat-server-$VOCECHAT_SERVER_VERION-$PLATFORM.zip"
-BIN_URL="https://sh.voce.chat/$BIN_NAME"
+BIN_URL="https://s.voce.chat/$BIN_NAME"
 echo "Downloading URL: $BIN_URL"
 
 # clear old data:
@@ -204,7 +204,7 @@ unzip -oq vocechat-server.zip || exit
 chmod a+x vocechat-server
 
 
-curl -f "https://sh.voce.chat/vocechat-server.sh" -o vocechat-server.sh || exit
+curl -f "https://s.voce.chat/vocechat-server.sh" -o vocechat-server.sh || exit
 if test "$DOMAIN" != ""; then
   sed -i "s/# domain = .*\$/domain = \"$DOMAIN\"/ig" config/config.toml
   echo $HTTPS_ON

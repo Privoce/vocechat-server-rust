@@ -1,5 +1,5 @@
 # webclient_url = "https://github.com/Privoce/vocechat-web/releases/latest/download"
-webclient_url = "https://github.com/Privoce/vocechat-web/releases/download/v0.3.0"
+webclient_url = "https://s.voce.chat/web_client/v0.3.x"
 
 [system]
 data_dir = "./data"
