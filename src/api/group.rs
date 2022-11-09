@@ -563,7 +563,11 @@ impl ApiGroup {
             }
             (false, true) => {
                 let origin_members = std::mem::take(&mut group.members);
-                let all_users = users.keys().copied().collect::<BTreeSet<_>>();
+                let all_users = users
+                    .iter()
+                    .filter(|(_, user)| !user.is_guest)
+                    .map(|(id, _)| *id)
+                    .collect();
                 let new_members = all_users
                     .difference(&origin_members)
                     .copied()
