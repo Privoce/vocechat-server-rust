@@ -27,7 +27,7 @@ poem = { version = "1.3.40", features = [
     "acme",
     'tokio-metrics',
 ] }
-poem-openapi = { version = "2.0.10", features = [
+poem-openapi = { version = "2.0.19", features = [
     "rapidoc",
     "swagger-ui",
     "redoc",

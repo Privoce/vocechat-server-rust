@@ -563,7 +563,7 @@ impl ApiGroup {
             }
             (false, true) => {
                 let origin_members = std::mem::take(&mut group.members);
-                let all_users = users
+                let all_users: BTreeSet<_> = users
                     .iter()
                     .filter(|(_, user)| !user.is_guest)
                     .map(|(id, _)| *id)
