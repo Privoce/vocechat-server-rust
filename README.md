@@ -1,3 +1,7 @@
+
+# Re-decentralized the Internet through personal cloud computing.
+## VoceChat is a ```15 MB``` chat server prioritizes private hosting!
+
 # Grand Goal
 
 The grand goal of Voce is to provide a space owned by "you" on the Internet, just as the name "voce" means in portguese. As cloud computing is getting matured, there will be a time in the foreseeable future that netizens like you and me can enjoy the benefit of having a personal cloud space on the Internet.
@@ -10,11 +14,11 @@ Digital technologies including Internet and the Web make information duplicable 
 
 Rust written server is only 15MB and runs with great efficiency, which means hosting a private social media server can become an individual thing, no matter where it is hosted--on your public cloud server, personal NAS or Raspberry Pi, etc. Just like cars v. public transportation, or single family home v. hotels, private social media is more personalized and all data is owned by the owner, so that there could be a new paradigm of private social media along with today's central social media platforms--if Facebook is a hotel, then Voce is like a house. However, private social media is not free--just like lands and houses are not free.
 
-# How to get interconnected (work in progress, welcome your contribution!)
+# How to get interconnected (work in progress, we welcome your contribution!)
 
 Private social media cannot always stay private if people want new information to be transferred among different servers. The word "social" in social media means multiple nodes communicate with multiple nodes in a synced space (mass to mass). A channel (private or public) should serve the end of this mass to mass data sharing and syncing space. Each channel should function like a "shared ledger" where members who joined should have the right to use their server to distributely store the same chat data--this functions like Bitcoin, yet in the chat channel scenario, efficiency should be more prioritiezed and trust does not necessarily come evenly from every node (admin of the channel could have the right to assign "power" to members)--compared with blockchain, git is a more proper example. Matrix.org has provided a standard exactly solving this multi-server data storage needs. Hence a support for matrix is desirable in the next steps.
 
-If any fellow netizens have better proposals on how multiple servers should get interconnected, please share and discuss it with us here.
+Or if you have a proposal on how multiple servers could get interconnected, feel free to share and discuss it with us here or through our chat at  https://voce.chat.
 
 # VoceChat Intro
 
@@ -50,8 +54,10 @@ Vocechat is an open-source product with a free community version and only charge
 - [x] Forward / 2022-Q1
 - [x] Favorate / 2022-Q1
 - [x] Burn after reading / 2022-Q2
-- [ ] Voice / 2022-Q4
-- [ ] Video / 2022-Q4
+- [x] Voice (now support agora) / 2022-Q4
+- [x] Video (now support agora)/ 2022-Q4
+- [ ] Matrix Bridge/ Undecided
+- [ ] Role based permission control/ Undecided
 
 ### Quickly run
 
