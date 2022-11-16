@@ -72,5 +72,6 @@ view: http://localhost:3000/
 
 ### Contact Us
 
-Github: [https://github.com/privoce/vocechat-server](https://github.com/privoce/vocechat-server)  
+Doc: [https://doc.voce.chat](https://doc.voce.chat)  
+Chat with us: [https://voce.chat](https://voce.chat)  
 Email: [han@privoce.com](han@privoce.com)
