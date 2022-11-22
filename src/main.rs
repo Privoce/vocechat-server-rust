@@ -72,6 +72,9 @@ struct Options {
     /// Listener bind address for AcmeHTTP_01
     #[clap(long = "network.tls.acme.http_bind")]
     network_tls_acme_http_bind: Option<String>,
+    /// Frontend url
+    #[clap(long = "network.frontend_url")]
+    frontend_url: Option<String>,
     /// Acme directory url
     #[clap(
         long = "network.tls.acme.directory_url",
@@ -135,6 +138,10 @@ impl Options {
                     );
                 }
             }
+        }
+
+        if let Some(frontend_url) = self.frontend_url {
+            config.network.frontend_url = frontend_url;
         }
 
         config
