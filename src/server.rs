@@ -13,7 +13,8 @@ use tokio::sync::{broadcast, mpsc, RwLock};
 use crate::{
     api,
     api::{
-        get_merged_message, AgoraConfig, FcmConfig, LoginConfig, OrganizationConfig, SmtpConfig,
+        get_merged_message, AgoraConfig, FcmConfig, FrontendUrlConfig, LoginConfig,
+        OrganizationConfig, SmtpConfig,
     },
     config::{KeyConfig, TemplateConfig},
     create_user::{CreateUser, CreateUserBy},
@@ -117,6 +118,9 @@ pub async fn create_state(config_path: &Path, config: Arc<Config>) -> Result<Sta
     // load dynamic config
     state
         .initialize_dynamic_config::<OrganizationConfig>()
+        .await?;
+    state
+        .initialize_dynamic_config::<FrontendUrlConfig>()
         .await?;
     state.initialize_dynamic_config::<SmtpConfig>().await?;
     state.initialize_dynamic_config::<FcmConfig>().await?;
@@ -243,12 +247,20 @@ pub fn load_template(
 }
 
 pub fn create_endpoint(state: State) -> impl Endpoint {
-    let api_service = state.config.network.domain.iter().fold(
+    let mut api_service = state.config.network.domain.iter().fold(
         api::create_api_service()
             .server("http://localhost:3000/api")
             .server("https://privoce.voce.chat/api"),
         |acc, domain| acc.server(format!("https://{}/api", domain)),
     );
+    if state.config.network.frontend_url.is_empty() {
+        api_service = api_service.server(if state.config.network.frontend_url.ends_with('/') {
+            format!("{}api", state.config.network.frontend_url)
+        } else {
+            format!("{}/api", state.config.network.frontend_url)
+        });
+    };
+
     let metrics = TokioMetrics::new();
 
     Route::new()

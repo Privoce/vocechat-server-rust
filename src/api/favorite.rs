@@ -77,7 +77,7 @@ impl ApiFavorite {
         sqlx::query(sql)
             .bind(token.uid)
             .bind(&uuid)
-            .bind(&now)
+            .bind(now)
             .execute(&state.db_pool)
             .await
             .map_err(InternalServerError)?;

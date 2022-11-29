@@ -22,7 +22,7 @@ impl Sequence {
 
     fn update_sequence_lease(ty: u8, db: &Db) -> Result<(i64, i64)> {
         let key = key_sequence(ty);
-        let next = match db.get(&key)? {
+        let next = match db.get(key)? {
             Some(value) => {
                 i64::from_be_bytes(value.as_ref().try_into().map_err(|_| Error::InvalidData)?)
             }

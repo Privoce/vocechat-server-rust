@@ -140,7 +140,7 @@ impl<'a> Messages<'a> {
     }
 
     pub fn insert_merged_msg(&self, mid: i64, msg: &[u8]) -> Result<()> {
-        self.db.db.insert(&key_merged_msg(mid), msg)?;
+        self.db.db.insert(key_merged_msg(mid), msg)?;
         Ok(())
     }
 
@@ -152,7 +152,7 @@ impl<'a> Messages<'a> {
     }
 
     pub fn remove_merged_msg(&self, mid: i64) -> Result<()> {
-        self.db.db.remove(&key_merged_msg(mid))?;
+        self.db.db.remove(key_merged_msg(mid))?;
         Ok(())
     }
 

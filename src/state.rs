@@ -8,7 +8,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use chrono::{Date, NaiveDate, TimeZone, Utc};
+use chrono::{NaiveDate, Utc};
 use futures_util::StreamExt;
 use itertools::Itertools;
 use num_enum::{FromPrimitive, IntoPrimitive};
@@ -27,7 +27,7 @@ use sqlx::SqlitePool;
 use tokio::sync::{broadcast, mpsc, Mutex, RwLock};
 use walkdir::WalkDir;
 
-use crate::api::UpdateAction;
+use crate::api::{FrontendUrlConfig, UpdateAction};
 use crate::{
     api::{
         get_merged_message, ChatMessage, DateTime, Group, GroupChangedMessage, KickFromGroupReason,
@@ -801,7 +801,7 @@ impl State {
         // clean in sqlite
         if let Err(err) =
             sqlx::query("delete from mute where expired_at notnull and expired_at < ?")
-                .bind(&now)
+                .bind(now)
                 .execute(&self.db_pool)
                 .await
         {
@@ -862,7 +862,7 @@ impl State {
     }
 
     pub fn clean_files(&self) {
-        let now = Utc::now().date();
+        let now = Utc::now().date_naive();
         clean_file_dir(
             now,
             &self.config.system.thumbnail_dir(),
@@ -1166,9 +1166,14 @@ pub(crate) async fn send_mail(
     Ok(())
 }
 
-pub fn get_frontend_url(state: &State, req: &Request) -> String {
-    if !state.config.network.frontend_url.is_empty() {
-        state.config.network.frontend_url.clone()
+pub async fn get_frontend_url(state: &State, req: &Request) -> String {
+    let frontend_url = state
+        .get_dynamic_config_instance::<FrontendUrlConfig>()
+        .await
+        .and_then(|config| config.url.clone());
+
+    if let Some(frontend_url) = frontend_url {
+        frontend_url
     } else {
         let tls_on = state.config.network.tls.is_some();
         let host = state
@@ -1215,7 +1220,7 @@ pub fn get_frontend_url(state: &State, req: &Request) -> String {
     }
 }
 
-fn clean_file_dir(now: Date<Utc>, path: &Path, expiry_days: i64) {
+fn clean_file_dir(now: NaiveDate, path: &Path, expiry_days: i64) {
     let mut remove_dirs = Vec::new();
     let mut iter = WalkDir::new(path).into_iter();
 
@@ -1240,7 +1245,6 @@ fn clean_file_dir(now: Date<Utc>, path: &Path, expiry_days: i64) {
                     }
                 })
                 .and_then(|(y, m, d)| NaiveDate::from_ymd_opt(y, m, d))
-                .map(|date| Utc.from_utc_date(&date))
             {
                 if (now - date).num_days() > expiry_days {
                     remove_dirs.push(entry_path.to_path_buf());
@@ -1258,7 +1262,7 @@ fn clean_file_dir(now: Date<Utc>, path: &Path, expiry_days: i64) {
 mod tests {
     use std::{path::Path, time::Duration};
 
-    use chrono::{NaiveDate, TimeZone, Utc};
+    use chrono::NaiveDate;
     use itertools::Itertools;
     use serde_json::json;
 
@@ -1420,7 +1424,7 @@ mod tests {
         create_dirs(path.path(), &dirs);
 
         clean_file_dir(
-            Utc.from_utc_date(&NaiveDate::from_ymd(2022, 1, 10)),
+            NaiveDate::from_ymd_opt(2022, 1, 10).unwrap(),
             path.path(),
             7,
         );
@@ -1439,7 +1443,7 @@ mod tests {
         );
 
         clean_file_dir(
-            Utc.from_utc_date(&NaiveDate::from_ymd(2022, 1, 12)),
+            NaiveDate::from_ymd_opt(2022, 1, 12).unwrap(),
             path.path(),
             7,
         );

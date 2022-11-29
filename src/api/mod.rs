@@ -26,7 +26,7 @@ pub use admin_agora::AgoraConfig;
 pub use admin_fcm::FcmConfig;
 pub use admin_login::{LoginConfig, WhoCanSignUp};
 pub use admin_smtp::SmtpConfig;
-pub use admin_system::{Metrics, OrganizationConfig};
+pub use admin_system::{FrontendUrlConfig, Metrics, OrganizationConfig};
 pub use admin_user::{User, UserDevice};
 pub use archive::Archive;
 pub use datetime::DateTime;

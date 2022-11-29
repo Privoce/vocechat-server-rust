@@ -271,8 +271,8 @@ impl ApiAdminUser {
             .bind(UpdateAction::Update)
             .bind(&req.email)
             .bind(&req.name)
-            .bind(&req.gender)
-            .bind(&req.is_admin)
+            .bind(req.gender)
+            .bind(req.is_admin)
             .bind(&req.language)
             .execute(&mut tx)
             .await

@@ -1667,21 +1667,21 @@ async fn check_metamask_public_address(
     }
     let sql = "select nonce from metamask_nonce where public_address = ?";
     let db_nonce = sqlx::query_as::<_, (String,)>(sql)
-        .bind(&public_address)
+        .bind(public_address)
         .fetch_optional(&state.db_pool)
         .await?
         .map(|(nonce,)| nonce);
     if db_nonce.as_deref() != Some(nonce) {
         return Ok(false);
     }
-    let message = web3::signing::hash_message(&nonce);
+    let message = web3::signing::hash_message(nonce);
     let recovery = web3::types::Recovery::from_raw_signature(message.as_bytes(), &signature)?;
     let address = web3::signing::recover(
         message.as_bytes(),
         &signature[..64],
         recovery.recovery_id().unwrap_or_default(),
     )?;
-    Ok(format!("0x{}", hex::encode(&address)) == public_address)
+    Ok(format!("0x{}", hex::encode(address)) == public_address)
 }
 
 async fn get_credential_google(state: &State, uid: i64) -> anyhow::Result<Option<String>> {

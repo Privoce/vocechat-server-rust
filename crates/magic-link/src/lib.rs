@@ -136,10 +136,10 @@ mod tests {
             extra_password,
         } = MagicLinkToken::parse(server_key, token).unwrap()
         {
-            assert_eq!(is_confirmed, true);
+            assert!(is_confirmed);
             assert_eq!(gid, None);
             assert_eq!(code.len(), 6);
-            assert_eq!(expired_at > 0, true);
+            assert!(expired_at > 0);
             assert_eq!(extra_email, None);
             assert_eq!(extra_password, None);
         } else {

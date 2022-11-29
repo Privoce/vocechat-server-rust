@@ -7,7 +7,6 @@ use poem_openapi::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::config::NetworkConfig;
 use crate::{
     api::{tags::ApiTags, token::Token, SmtpConfig, UserInfo},
     create_user::{CreateUser, CreateUserBy},
@@ -24,6 +23,24 @@ pub struct Metrics {
     group_count: usize,
     online_user_count: usize,
     version: String,
+}
+
+/// Frontend url
+#[derive(Debug, Object, Serialize, Deserialize, Default)]
+pub struct FrontendUrlConfig {
+    pub url: Option<String>,
+}
+
+impl DynamicConfig for FrontendUrlConfig {
+    type Instance = Self;
+
+    fn name() -> &'static str {
+        "frontend-url"
+    }
+
+    fn create_instance(self) -> Self::Instance {
+        self
+    }
 }
 
 /// Organization info
@@ -272,38 +289,14 @@ impl ApiAdminSystem {
             ));
         }
 
-        unsafe {
-            let network = &state.config.network as *const NetworkConfig as *mut NetworkConfig;
-            let network2 = &mut *network;
-            network2.frontend_url = frontend_url.to_string();
-        };
-
-        #[cfg(not(test))]
-        let config_file_path = state.config_path.as_path();
-        #[cfg(test)]
-        let config_file_path =
-            std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/config/config.toml"));
-        if !config_file_path.exists() {
-            return Err(Error::from_string(
-                "config.toml does not exists!",
-                StatusCode::INTERNAL_SERVER_ERROR,
-            ));
-        }
-        let config_content = tokio::fs::read_to_string(&config_file_path)
-            .await
-            .map_err(InternalServerError)?;
-
-        let re = regex::Regex::new(r#"frontend_url\s*=\s*".*?""#).unwrap();
-        let new_content = re.replace(
-            &config_content,
-            format!(r#"frontend_url = "{}""#, frontend_url),
-        );
-
-        if !new_content.is_empty() {
-            tokio::fs::write(&config_file_path, new_content.as_bytes())
-                .await
-                .map_err(InternalServerError)?;
-        }
+        state
+            .set_dynamic_config(DynamicConfigEntry {
+                enabled: true,
+                config: FrontendUrlConfig {
+                    url: Some(frontend_url.to_string()),
+                },
+            })
+            .await?;
         Ok(())
     }
 }

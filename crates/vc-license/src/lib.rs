@@ -18,8 +18,8 @@ impl Default for License {
         License {
             domains: vec![],
             user_limit: 0,
-            created_at: chrono::MIN_DATETIME,
-            expired_at: chrono::MIN_DATETIME,
+            created_at: DateTime::<Utc>::MIN_UTC,
+            expired_at: DateTime::<Utc>::MIN_UTC,
             sign: vec![],
         }
     }
@@ -243,8 +243,10 @@ dnwtOymXGQpaS/Vfo0q1kGzZoXsCx3v7BQIDAQAB
 
         let expired_at = chrono::NaiveDate::parse_from_str("2025-01-01", "%Y-%m-%d")
             .expect("Date format error: %Y-%m-%d, just like: 2024-02-01");
-        let expired_at =
-            chrono::NaiveDateTime::new(expired_at, chrono::NaiveTime::from_hms(0, 0, 0));
+        let expired_at = chrono::NaiveDateTime::new(
+            expired_at,
+            chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
+        );
         let expired_at = chrono::DateTime::<Utc>::from_utc(expired_at, Utc);
         let license = licensegen.gen("www.domain.com|www.domain2.com", expired_at, 20);
 

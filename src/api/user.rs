@@ -468,7 +468,7 @@ impl ApiUser {
         req: &Request,
     ) -> Result<Json<SendRegMagicTokenResponse>> {
         use poem::http::StatusCode;
-        let url = crate::state::get_frontend_url(&state, req);
+        let url = crate::state::get_frontend_url(&state, req).await;
         let key_config = state.key_config.read().await;
 
         let smtp_on = state
@@ -498,7 +498,7 @@ impl ApiUser {
             }
 
             let expired_at = {
-                let naive = chrono::NaiveDateTime::from_timestamp(expired_at, 0);
+                let naive = chrono::NaiveDateTime::from_timestamp_opt(expired_at, 0).unwrap();
                 chrono::DateTime::from_utc(naive, chrono::Utc)
             };
 
@@ -615,7 +615,7 @@ impl ApiUser {
             return Err(Error::from_status(StatusCode::NOT_ACCEPTABLE));
         }
 
-        let url = crate::state::get_frontend_url(&state, req);
+        let url = crate::state::get_frontend_url(&state, req).await;
         let code = rc_magic_link::gen_code();
         let expired_at = chrono::Utc::now()
             + chrono::Duration::seconds(state.config.system.magic_token_expiry_seconds);
@@ -679,7 +679,7 @@ impl ApiUser {
         let sql = "update user set password = ? where uid = ?";
         sqlx::query(sql)
             .bind(&req.new_password)
-            .bind(&token.uid)
+            .bind(token.uid)
             .execute(&state.db_pool)
             .await
             .map_err(InternalServerError)?;

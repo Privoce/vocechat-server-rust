@@ -15,7 +15,7 @@ impl DateTime {
     }
 
     pub fn zero() -> Self {
-        Self(Utc.timestamp_millis(0))
+        Self(Utc.timestamp_millis_opt(0).unwrap())
     }
 }
 
@@ -100,7 +100,7 @@ impl poem_openapi::types::Type for DateTime {
 impl poem_openapi::types::ParseFromJSON for DateTime {
     fn parse_from_json(value: Option<Value>) -> poem_openapi::types::ParseResult<Self> {
         i64::parse_from_json(value)
-            .map(|timestamp| Self(Utc.timestamp_millis(timestamp)))
+            .map(|timestamp| Self(Utc.timestamp_millis_opt(timestamp).unwrap()))
             .map_err(poem_openapi::types::ParseError::propagate)
     }
 }

@@ -272,7 +272,7 @@ impl State {
                 .bind(uid)
                 .bind(UpdateAction::Create)
                 .bind(email)
-                .bind(&create_user.name)
+                .bind(create_user.name)
                 .bind(create_user.gender)
                 .bind(&language)
                 .bind(avatar_updated_at)

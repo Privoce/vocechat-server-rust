@@ -162,8 +162,8 @@ impl ApiGroup {
         let sql = "insert into `group` (name, description, owner, is_public, created_at, updated_at) values (?, ?, ?, ?, ?, ?)";
         let gid = sqlx::query(sql)
             .bind(&req.0.name)
-            .bind(&req.0.description.as_deref().unwrap_or_default())
-            .bind(&owner)
+            .bind(req.0.description.as_deref().unwrap_or_default())
+            .bind(owner)
             .bind(req.is_public)
             .bind(now)
             .bind(now)
@@ -869,7 +869,7 @@ impl ApiGroup {
                 return Err(Error::from_status(StatusCode::FORBIDDEN));
             }
         }
-        let url = crate::state::get_frontend_url(&state, req);
+        let url = crate::state::get_frontend_url(&state, req).await;
         let code = rc_magic_link::gen_code();
         let expired_at = chrono::Utc::now()
             + chrono::Duration::seconds(
