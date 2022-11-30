@@ -14,13 +14,17 @@ pub struct ApiAdminFirebase;
 /// Firebase config
 #[derive(Debug, Object, Serialize, Deserialize, Default)]
 pub struct FcmConfig {
-    #[serde(default)]
+    #[serde(default = "default_use_offical")]
     use_offical: bool,
     #[oai(default = "default_token_url")]
     token_url: String,
     project_id: String,
     private_key: String,
     client_email: String,
+}
+
+fn default_use_offical() -> bool {
+    true
 }
 
 fn default_token_url() -> String {
