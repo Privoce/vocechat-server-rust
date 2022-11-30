@@ -222,13 +222,15 @@ fi
 sed_replace "s#WORKDIR=.*\$#WORKDIR=\"$WORK_DIR\"#ig" vocechat-server.sh
 
 chmod a+x vocechat-server.sh
+
 if test -d /etc/init.d/; then
   cp -rf vocechat-server.sh /etc/init.d/
   echo "install done! "
   echo "run: /etc/init.d/vocechat-server.sh start|stop|restart"
 else
-  echo "install done! "
-  echo "run: /etc/init.d/vocechat-server.sh start|stop|restart"
+  echo "/etc/init.d/ does not exists, refused! please try Ubuntu or CentOS, you can contact han@privoce.com."
+  exit
+  # echo "run: /etc/init.d/vocechat-server.sh start|stop|restart"
 fi
 
 export PATH=$PATH:$WORK_DIR
