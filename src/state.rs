@@ -907,6 +907,21 @@ impl State {
     pub async fn load_dynamic_config<T: DynamicConfig>(
         &self,
     ) -> anyhow::Result<DynamicConfigEntry<T>> {
+        self.load_dynamic_config_with(|| DynamicConfigEntry {
+            enabled: false,
+            config: T::default(),
+        })
+        .await
+    }
+
+    pub async fn load_dynamic_config_with<T, F>(
+        &self,
+        f: F,
+    ) -> anyhow::Result<DynamicConfigEntry<T>>
+    where
+        T: DynamicConfig,
+        F: FnOnce() -> DynamicConfigEntry<T>,
+    {
         let sql = "select enabled, value from config where name = ?";
         match sqlx::query_as::<_, (bool, String)>(sql)
             .bind(T::name())
@@ -917,10 +932,7 @@ impl State {
                 enabled,
                 config: serde_json::from_str(&value)?,
             }),
-            None => Ok(DynamicConfigEntry {
-                enabled: false,
-                config: T::default(),
-            }),
+            None => Ok(f()),
         }
     }
 
@@ -953,8 +965,23 @@ impl State {
         Ok(())
     }
 
-    pub async fn initialize_dynamic_config<T: DynamicConfig>(&self) -> anyhow::Result<()> {
-        let entry = self.load_dynamic_config::<T>().await?;
+    pub async fn initialize_dynamic_config<T>(&self) -> anyhow::Result<()>
+    where
+        T: DynamicConfig,
+    {
+        self.initialize_dynamic_config_with(|| DynamicConfigEntry {
+            enabled: false,
+            config: T::default(),
+        })
+        .await
+    }
+
+    pub async fn initialize_dynamic_config_with<T, F>(&self, f: F) -> anyhow::Result<()>
+    where
+        T: DynamicConfig,
+        F: FnOnce() -> DynamicConfigEntry<T>,
+    {
+        let entry = self.load_dynamic_config_with::<T, _>(f).await?;
         if entry.enabled {
             let instance = entry.config.create_instance();
             self.cache

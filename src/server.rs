@@ -18,7 +18,7 @@ use crate::{
     },
     config::{KeyConfig, TemplateConfig},
     create_user::{CreateUser, CreateUserBy},
-    state::{BroadcastEvent, Cache, Template, Templates},
+    state::{BroadcastEvent, Cache, DynamicConfigEntry, Template, Templates},
     Config, SqlitePool, State,
 };
 
@@ -123,7 +123,15 @@ pub async fn create_state(config_path: &Path, config: Arc<Config>) -> Result<Sta
         .initialize_dynamic_config::<FrontendUrlConfig>()
         .await?;
     state.initialize_dynamic_config::<SmtpConfig>().await?;
-    state.initialize_dynamic_config::<FcmConfig>().await?;
+    state
+        .initialize_dynamic_config_with::<FcmConfig, _>(|| DynamicConfigEntry {
+            enabled: true,
+            config: FcmConfig {
+                use_offical: true,
+                ..Default::default()
+            },
+        })
+        .await?;
     state.initialize_dynamic_config::<AgoraConfig>().await?;
     state.initialize_dynamic_config::<LoginConfig>().await?;
 
