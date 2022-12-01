@@ -1197,7 +1197,14 @@ pub async fn get_frontend_url(state: &State, req: &Request) -> String {
     let frontend_url = state
         .get_dynamic_config_instance::<FrontendUrlConfig>()
         .await
-        .and_then(|config| config.url.clone());
+        .and_then(|config| config.url.clone())
+        .or_else(|| {
+            if !state.config.network.frontend_url.is_empty() {
+                Some(state.config.network.frontend_url.clone())
+            } else {
+                None
+            }
+        });
 
     if let Some(frontend_url) = frontend_url {
         frontend_url
