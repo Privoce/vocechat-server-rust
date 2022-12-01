@@ -127,7 +127,7 @@ pub async fn create_state(config_path: &Path, config: Arc<Config>) -> Result<Sta
         .initialize_dynamic_config_with::<FcmConfig, _>(|| DynamicConfigEntry {
             enabled: true,
             config: FcmConfig {
-                use_offical: true,
+                use_official: true,
                 ..Default::default()
             },
         })
