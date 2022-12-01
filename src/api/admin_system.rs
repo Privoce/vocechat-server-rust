@@ -107,12 +107,13 @@ impl ApiAdminSystem {
     async fn create_admin_user(
         &self,
         state: Data<&State>,
-        req: Json<CreateAdminRequest>,
+        mut req: Json<CreateAdminRequest>,
     ) -> Result<Json<UserInfo>> {
         if !state.cache.read().await.users.is_empty() {
             return Err(poem::Error::from_status(StatusCode::FORBIDDEN));
         }
 
+        req.email.0 = req.email.0.to_lowercase();
         let (uid, user) = match state
             .create_user(
                 CreateUser::new(
