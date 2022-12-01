@@ -256,12 +256,10 @@ pub fn load_template(
 
 pub fn create_endpoint(state: State) -> impl Endpoint {
     let mut api_service = state.config.network.domain.iter().fold(
-        api::create_api_service()
-            .server("http://localhost:3000/api")
-            .server("https://privoce.voce.chat/api"),
+        api::create_api_service().server("http://localhost:3000/api"),
         |acc, domain| acc.server(format!("https://{}/api", domain)),
     );
-    if state.config.network.frontend_url.is_empty() {
+    if !state.config.network.frontend_url.is_empty() {
         api_service = api_service.server(if state.config.network.frontend_url.ends_with('/') {
             format!("{}api", state.config.network.frontend_url)
         } else {
