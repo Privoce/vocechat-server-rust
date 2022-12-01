@@ -14,8 +14,8 @@ pub struct ApiAdminFirebase;
 /// Firebase config
 #[derive(Debug, Object, Serialize, Deserialize, Default)]
 pub struct FcmConfig {
-    #[serde(default = "default_use_offical")]
-    pub use_offical: bool,
+    #[serde(default = "default_use_official")]
+    pub use_official: bool,
     #[oai(default = "default_token_url")]
     pub token_url: String,
     pub project_id: String,
@@ -23,7 +23,7 @@ pub struct FcmConfig {
     pub client_email: String,
 }
 
-fn default_use_offical() -> bool {
+fn default_use_official() -> bool {
     true
 }
 
@@ -39,7 +39,7 @@ impl DynamicConfig for FcmConfig {
     }
 
     fn create_instance(self) -> Self::Instance {
-        if self.use_offical {
+        if self.use_official {
             FcmClient::new(ApplicationCredentials {
                 project_id: "vocechatdev".to_string(),
                 private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCTnF6VYea6IHAM\nRysub/vjCefL9L7pKZVOMHn+2Upg6sTyYwu7q2utvdBN7jNwCMKHadzMMvCn7R+q\nVFTNqjrBwav1D5pRhsAubGNR6h3n1ycGe4HrXfeSGrxKmd8CQwcYyWP5rhtC2HyV\nNIgFRXMmQ/PUzf8YscScFZduFFUgNV1uate5jCv7hZOuymt8H7fov1MZFcgejk0+\nAr5wHG4pEW9aB6TWTcx/qqTPeP2qWhjbLBVJLMisc67TJEoV0xUmcUVWFRXhYkVR\nlBDZrsDr62jqqm1lJYTDGBW6ZvEzM/iXEK1K84NULpHhsnVmHE/savG6w6BQ4qaH\nnWfMSh9RAgMBAAECggEAASFi5OT+raHyouwI2qKMiMmJfq/5GUHXQQ9GAOYDuWRb\nRdUThZbEPky9KsdqWdpauITuou2+ygkHqGMvazi8pofiP+z0TRln931yOrhtJxQb\nijbIDBZ6GNKNkURWeNusuYBIOYG8N1XMD79OE+nBrjszg7EmtrPP6VQKpt/Faar1\nK8Oha8h8sV4bb4iqHJpNdW0aW5uhNbcQ+lWJZK8gJ9PgAA3uqfNv+UEN0fa08lb0\nspY30hdG56QuLq9nr8AigNzbprWVl1s1LtbhCzA1GMZfthu8K7ZutONvgonoIFRd\nxkEb/WMuSKhl3B/TTpEaA9C9zk9WXQbmNZINoIYAAQKBgQDO31hr502JJKz8LNmX\nqVcTwFBLWfyKw/rUxR74AKzaCygeBhOU/4C1yISnU51UeRJ/SrtaDEMmBrD/s00h\nOUhFi142ARFSDIPnMR+eEoVeSgAtCSMG1/tW9X15zjHCobgN42Y+5vq0qtYQKygM\nexwvdD5CU/1gOligInOhmKEAAQKBgQC2qkIWu94NkEVYKtOIRCP4ektyrZPW+maj\nfYsKQhso/+JhFKL1AucdkUfIcJc8Sxt430iUD0S/4nKfR1OgN1F4YL99ZbbaEbVR\njGzU1Ldg5P7y7IQ3h7YygrxBdhqwSylLoydr7Lf/cxbqNAbILagQwB4JAHG01JYi\nLyPSAlkfUQKBgH0AF72blg44Sw5VS2WIvUUB/4KIbUCsCvRl58CTJ97YvvTlVw/B\nE1TEROOWcoqIXdTsoyhWIHzprinTfdeFdVYQUGzxWDXruggIdsJdDplavaB41OFd\nwFFbJOZk4Uxpy30Y2r9HclWYpKBAc4KXIQDLjJMnjQKIPuUD7DrIrwABAoGAQlUr\nsMPCTFyiwfSzYl2UTmxir59W+49s7FvvvObqpAXgOG7dCmpmcTdLwP8Z/Hwt2sQC\nwDmXNrNN+odVV+4euL8xaqEgOKqLlLSQ5OzmNtqRtreq/9tZj5goMwFnibORqHT0\nIN4Sp0ItBRmliNYDnSmW/p/Zqtg0OO+za1UM9jECgYAL1BQr6+qbvyCaT61OoXkv\nz/0NMWDROmsbdTdyxTCU6qqIKUJjCOzET7aGahhqLaY4Y1sCnwN7PuDjdM5wvX+f\nDppfxRPxLwN5xWWHMydUcKwu+8gZuvVF73i4G3RsSGtf2IYLzshC3em+VpL46JOc\neYi8fGY6puD0XaSOZxXAKQ==\n-----END PRIVATE KEY-----\n".to_string(),
