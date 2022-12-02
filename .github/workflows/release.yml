@@ -38,7 +38,7 @@ jobs:
             cross: true
             pre_install: sudo apt-get install -y rsync
           - build: aarch64
-            os: [ubuntu-latest, [self-hosted, linux, ARM64]]
+            os: [self-hosted,linux,ARM64]
             rust: stable
             target: aarch64-unknown-linux-musl
             cross: true
@@ -56,7 +56,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/cargo@v1
         with:
           use-cross: true
@@ -101,11 +101,11 @@ jobs:
           # build latest
           sed -i "s/alpine/arm64v8\/alpine/ig" Dockerfile
           sed -i "s/busybox/arm64v8\/busybox/ig" Dockerfile
-          docker build -t vocechat-server:latest-arm64 .
+          docker buildx build -t vocechat-server:latest-arm64 --platform linux/arm64 .
           docker tag vocechat-server:latest-arm64 privoce/vocechat-server:latest-arm64
           docker push privoce/vocechat-server:latest-arm64
           # build version
-          docker build -t vocechat-server:${{ github.ref_name}}-arm64 .
+          docker buildx build -t vocechat-server:${{ github.ref_name}}-arm64 --platform linux/arm64 .
           docker tag vocechat-server:${{ github.ref_name}}-arm64 privoce/vocechat-server:${{ github.ref_name}}-arm64
           docker push privoce/vocechat-server:${{ github.ref_name}}-arm64
       - name: rsync to s.voce.chat
@@ -128,7 +128,7 @@ jobs:
       #          tag_name: ${{ github.ref_name }}
       #        env:
       #          GITHUB_TOKEN: ${{ secrets.THE_GITHUB_TOKEN }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
