@@ -38,7 +38,7 @@ jobs:
             cross: true
             pre_install: sudo apt-get install -y rsync
           - build: aarch64
-            os: ubuntu-latest
+            os: [ubuntu-latest, [self-hosted, linux, ARM64]]
             rust: stable
             target: aarch64-unknown-linux-musl
             cross: true
