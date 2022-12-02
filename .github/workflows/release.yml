@@ -99,7 +99,7 @@ jobs:
           cp -rf ../../config ./
           docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
           # build latest
-          sed -i "s/alpine/arm64v8\/alpine/ig" Dockerfile
+          # sed -i "s/alpine/arm64v8\/alpine/ig" Dockerfile
           sed -i "s/busybox/arm64v8\/busybox/ig" Dockerfile
           docker buildx build -t vocechat-server:latest-arm64 --platform linux/arm64 .
           docker tag vocechat-server:latest-arm64 privoce/vocechat-server:latest-arm64
