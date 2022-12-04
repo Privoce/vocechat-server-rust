@@ -710,14 +710,7 @@ fn internal_send_message(
                 Some(reaction.mid)
             }
             MessageReactionDetail::Like(_) => None,
-            MessageReactionDetail::Delete(_) => {
-                state
-                    .msg_db
-                    .messages()
-                    .remove_merged_msg(reaction.mid)
-                    .map_err(InternalServerError)?;
-                Some(reaction.mid)
-            }
+            MessageReactionDetail::Delete(_) => None,
         },
         MessageDetail::Reply(reply) => {
             let merged_payload = MergedMessagePayload {
