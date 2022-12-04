@@ -287,8 +287,8 @@ fn main() {
             let state = state.clone();
             async move {
                 loop {
-                    tokio::time::sleep(Duration::from_secs(60 * 60 * 24)).await;
                     state.clean_guest().await;
+                    tokio::time::sleep(Duration::from_secs(60 * 60 * 24)).await;
                 }
             }
         });

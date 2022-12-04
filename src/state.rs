@@ -319,7 +319,7 @@ impl Cache {
             self.assign_username_by_email(email)
         } else {
             loop {
-                let new_name = format!("User{}", fastrand::u32(1111..9999));
+                let new_name = format!("User{}", fastrand::u32(111111..999999));
                 if self.check_name_conflict(&new_name) {
                     break Cow::Owned(new_name);
                 }
@@ -1008,7 +1008,7 @@ impl State {
 
     pub async fn clean_guest(&self) {
         if let Ok(users) = sqlx::query_as::<_, (i64,)>(
-            "select uid from user where is_guest = true and time('now', '-7 days') >= created_at",
+            "select uid from user where is_guest = true and datetime('now', '-7 days') >= created_at",
         )
         .fetch_all::<_>(&self.db_pool)
         .await
