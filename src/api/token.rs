@@ -630,14 +630,9 @@ impl ApiToken {
             }
         }
 
-        const MAX_USER_NUMBER: usize = 1000;
-        let can_register = if state.cache.read().await.users.len() >= MAX_USER_NUMBER {
-            false
-        } else {
-            match login_cfg.who_can_sign_up {
-                WhoCanSignUp::InvitationOnly => magic_token.is_some(),
-                _ => true,
-            }
+        let can_register = match login_cfg.who_can_sign_up {
+            WhoCanSignUp::InvitationOnly => magic_token.is_some(),
+            _ => true,
         };
 
         let uid = match req.0.credential {
