@@ -981,9 +981,10 @@ impl ApiUser {
             tx_msg,
         ));
 
-        Ok(EventStream::new(
-            tokio_stream::wrappers::UnboundedReceiverStream::new(rx_msg).boxed(),
-        ))
+        Ok(
+            EventStream::new(tokio_stream::wrappers::UnboundedReceiverStream::new(rx_msg).boxed())
+                .keep_alive(Duration::from_secs(5)),
+        )
     }
 
     /// Get all devices of the current user
