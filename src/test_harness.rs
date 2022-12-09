@@ -245,6 +245,7 @@ impl TestServer {
             .get("/api/user/events")
             .query("api-key", &token.as_ref())
             .header("Referer", "http://localhost/")
+            .header("Connection", "keep-alive")
             .content_type("text/event-stream");
         if let Some(after_mid) = after_mid {
             builder = builder.query("after_mid", &after_mid);
