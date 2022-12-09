@@ -1546,7 +1546,7 @@ fn get_users_state(cache: &Cache, current_uid: i64) -> UsersStateMessage {
             .users
             .iter()
             .filter_map(|(uid, user)| {
-                if *uid != current_uid {
+                if *uid != current_uid && !user.is_guest {
                     Some(UserState {
                         uid: *uid,
                         online: user.is_online(),
