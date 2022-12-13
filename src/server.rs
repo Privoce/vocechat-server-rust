@@ -18,7 +18,10 @@ use crate::{
     },
     config::{KeyConfig, TemplateConfig},
     create_user::{CreateUser, CreateUserBy},
-    state::{BroadcastEvent, Cache, DynamicConfigEntry, Template, Templates},
+    state::{
+        forward_chat_messages_to_webhook, BroadcastEvent, Cache, DynamicConfigEntry, Template,
+        Templates,
+    },
     Config, SqlitePool, State,
 };
 
@@ -152,6 +155,7 @@ pub async fn create_state(config_path: &Path, config: Arc<Config>) -> Result<Sta
     }
 
     tokio::spawn(process_msg_updated(state.clone(), msg_updated_rx));
+    tokio::spawn(forward_chat_messages_to_webhook(state.clone()));
     Ok(state)
 }
 

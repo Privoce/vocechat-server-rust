@@ -1,8 +1,9 @@
 use image::ImageFormat;
 use poem::{error::InternalServerError, http::StatusCode, web::Data, Error, Result};
-use poem_openapi::param::Query;
 use poem_openapi::{
+    param::Query,
     payload::{Binary, Json, PlainText},
+    types::Email,
     ApiRequest, Object, OpenApi,
 };
 use serde::{Deserialize, Serialize};
@@ -14,7 +15,6 @@ use crate::{
     state::{send_mail, DynamicConfig, DynamicConfigEntry},
     State,
 };
-use poem_openapi::types::Email;
 
 /// Server metrics
 #[derive(Debug, Object)]

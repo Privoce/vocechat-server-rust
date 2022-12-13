@@ -9,6 +9,7 @@ mod admin_smtp;
 mod admin_system;
 mod admin_user;
 mod archive;
+mod bot;
 mod datetime;
 mod favorite;
 mod group;
@@ -42,8 +43,7 @@ pub use message::{
     UserUpdateLog, UsersStateMessage, UsersUpdateLogMessage,
 };
 pub use resource::FileMeta;
-pub use token::CurrentUser;
-pub use token::Token;
+pub use token::{CurrentUser, Token};
 pub use user::{
     CreateUserConflictReason, CreateUserResponse, UpdateUserResponse, UserConflict, UserInfo,
 };
@@ -67,6 +67,7 @@ pub fn create_api_service() -> OpenApiService<impl OpenApi, ()> {
             admin_login::ApiAdminLogin,
             admin_google_auth::ApiAdminGoogleAuth,
             admin_github_auth::ApiAdminGithubAuth,
+            bot::ApiBot,
         ),
         "Voce Chat",
         env!("CARGO_PKG_VERSION"),

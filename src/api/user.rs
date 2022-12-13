@@ -8,10 +8,9 @@ use poem::{
     web::Data,
     Body, Error, Request, Result,
 };
-use poem_openapi::payload::PlainText;
 use poem_openapi::{
     param::{Header, Path, Query},
-    payload::{Binary, EventStream, Json},
+    payload::{Binary, EventStream, Json, PlainText},
     types::{Email, ToJSON},
     ApiRequest, ApiResponse, Enum, Object, OpenApi,
 };
@@ -40,7 +39,7 @@ use crate::{
         token::{Token, TokenInQuery},
         BurnAfterReadingGroup, BurnAfterReadingUser, ChatMessage, ChatMessagePayload, CurrentUser,
         DateTime, HeartbeatMessage, KickMessage, LangId, LoginConfig, Message, MessageTarget,
-        MuteGroup, MuteUser, ReadIndexGroup, ReadIndexUser, UpdateAction,
+        MuteGroup, MuteUser, ReadIndexGroup, ReadIndexUser, UpdateAction, User,
         UserSettingsChangedMessage, UserSettingsMessage, UserStateChangedMessage, UserUpdateLog,
         UsersUpdateLogMessage,
     },
@@ -245,9 +244,9 @@ pub struct UserConflict {
 }
 
 #[derive(Debug, ApiResponse)]
-pub enum CreateUserResponse<T: ToJSON> {
+pub enum CreateUserResponse {
     #[oai(status = 200)]
-    Ok(Json<T>),
+    Ok(Json<User>),
     #[oai(status = 409)]
     Conflict(Json<UserConflict>),
 }
@@ -1851,9 +1850,12 @@ mod tests {
     use serde::Deserialize;
     use serde_json::json;
 
-    use crate::api::LoginConfig;
-    use crate::config::TemplateConfig;
-    use crate::{api::SmtpConfig, state::DynamicConfigEntry, test_harness::TestServer};
+    use crate::{
+        api::{LoginConfig, SmtpConfig},
+        config::TemplateConfig,
+        state::DynamicConfigEntry,
+        test_harness::TestServer,
+    };
 
     #[tokio::test]
     async fn test_events_after_mid() {
@@ -3753,7 +3755,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
 
-        //resp.assert_text("xxx").await;
+        // resp.assert_text("xxx").await;
         let json = resp.json().await;
         assert_eq!(
             email1,

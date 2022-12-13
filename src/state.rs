@@ -1,9 +1,8 @@
-use std::path::PathBuf;
 use std::{
     any::Any,
     borrow::Cow,
     collections::{BTreeMap, BTreeSet, HashMap},
-    path::Path,
+    path::{Path, PathBuf},
     sync::Arc,
     time::{Duration, SystemTime},
 };
@@ -18,21 +17,20 @@ use poem::{
     http::StatusCode,
     Request,
 };
-
-use poem_openapi::Enum;
+use poem_openapi::{types::ToJSON, Enum};
 use rc_magic_link::MagicLinkToken;
 use rc_msgdb::MsgDb;
+use reqwest::Client;
 use serde::{de::DeserializeOwned, Serialize};
 use sqlx::SqlitePool;
 use tokio::sync::{broadcast, mpsc, Mutex, RwLock};
 use walkdir::WalkDir;
 
-use crate::api::{FrontendUrlConfig, UpdateAction};
 use crate::{
     api::{
-        get_merged_message, ChatMessage, DateTime, Group, GroupChangedMessage, KickFromGroupReason,
-        KickReason, LangId, PinnedMessage, SmtpConfig, User, UserDevice, UserInfo,
-        UserSettingsChangedMessage, UserStateChangedMessage, UserUpdateLog,
+        get_merged_message, ChatMessage, DateTime, FrontendUrlConfig, Group, GroupChangedMessage,
+        KickFromGroupReason, KickReason, LangId, PinnedMessage, SmtpConfig, UpdateAction, User,
+        UserDevice, UserInfo, UserSettingsChangedMessage, UserStateChangedMessage, UserUpdateLog,
     },
     config::KeyConfig,
     Config,
@@ -131,6 +129,7 @@ pub struct CacheUser {
     pub avatar_updated_at: DateTime,
     pub status: UserStatus,
     pub is_guest: bool,
+    pub webhook_url: Option<String>,
 }
 
 impl CacheUser {
@@ -394,7 +393,7 @@ pub struct State {
 impl State {
     pub async fn load_users_cache(db: &SqlitePool) -> sqlx::Result<BTreeMap<i64, CacheUser>> {
         let mut users = BTreeMap::new();
-        let sql = "select uid, email, name, password, gender, is_admin, language, create_by, created_at, updated_at, avatar_updated_at, status, is_guest from user";
+        let sql = "select uid, email, name, password, gender, is_admin, language, create_by, created_at, updated_at, avatar_updated_at, status, is_guest, webhook_url from user";
         let mut stream = sqlx::query_as::<
             _,
             (
@@ -411,6 +410,7 @@ impl State {
                 DateTime,
                 i8,
                 bool,
+                Option<String>,
             ),
         >(sql)
         .fetch(db);
@@ -429,6 +429,7 @@ impl State {
                 avatar_updated_at,
                 status,
                 is_guest,
+                webhook_url,
             ) = res?;
 
             let devices = sqlx::query_as::<_, (String, Option<String>)>(
@@ -530,6 +531,7 @@ impl State {
                     avatar_updated_at,
                     status: status.into(),
                     is_guest,
+                    webhook_url,
                 },
             );
         }
@@ -703,9 +705,9 @@ impl State {
     // pub async fn magic_code_check_email(&self, email: &str, code: &code) -> bool{
     //     let mut cache = self.cache.write().await;
     //     if let Some(code) = cache.codes.email_code.get(email) {
-    //         if let Some((remain_times, expired_at, email2)) = cache.codes.codes.get_mut(code) {
-    //             // if !email2.is_empty() && email2.as_str() != email {
-    //             //     return false;
+    //         if let Some((remain_times, expired_at, email2)) =
+    // cache.codes.codes.get_mut(code) {             // if !email2.is_empty() &&
+    // email2.as_str() != email {             //     return false;
     //             // }
     //             if *expired_at < Utc::now() || *remain_times <= 0 {
     //                 cache.codes.codes.remove(code);
@@ -1289,6 +1291,52 @@ fn clean_file_dir(now: NaiveDate, path: &Path, expiry_days: i64) {
 
     for p in remove_dirs {
         let _ = std::fs::remove_dir_all(&p);
+    }
+}
+
+pub(crate) async fn forward_chat_messages_to_webhook(state: State) {
+    let client = Client::new();
+    let mut rx = state.event_sender.subscribe();
+
+    while let Ok(event) = rx.recv().await {
+        if let BroadcastEvent::Chat { targets, message } = &*event {
+            let webhook_urls = state
+                .cache
+                .read()
+                .await
+                .users
+                .iter()
+                .filter_map(|(uid, user)| {
+                    if !targets.contains(uid) {
+                        None
+                    } else {
+                        user.webhook_url.as_ref().cloned()
+                    }
+                })
+                .collect::<Vec<_>>();
+            let msg_json = message.to_json_string();
+
+            for webhook_url in webhook_urls {
+                let client = client.clone();
+                let msg_json = msg_json.clone();
+
+                tokio::spawn(async move {
+                    for _ in 0..3 {
+                        if client
+                            .post(&webhook_url)
+                            .body(msg_json.clone())
+                            .send()
+                            .await
+                            .and_then(|resp| resp.error_for_status())
+                            .is_ok()
+                        {
+                            break;
+                        }
+                        tokio::time::sleep(Duration::from_secs(1)).await;
+                    }
+                });
+            }
+        }
     }
 }
 

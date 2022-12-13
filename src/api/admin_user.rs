@@ -2,13 +2,19 @@ use std::sync::Arc;
 
 use itertools::Itertools;
 use poem::{error::InternalServerError, http::StatusCode, web::Data, Error, Result};
-use poem_openapi::{param::Path, payload::Json, types::Email, Object, OpenApi};
+use poem_openapi::{
+    param::{Path, Query},
+    payload::Json,
+    types::Email,
+    Object, OpenApi,
+};
 
 use crate::{
     api::{
         tags::ApiTags, token::Token, CreateUserConflictReason, CreateUserResponse, DateTime,
         KickReason, LangId, UpdateAction, UpdateUserResponse, UserConflict, UserUpdateLog,
     },
+    api_key::create_api_key,
     create_user::{CreateUser, CreateUserBy, CreateUserError},
     state::{BroadcastEvent, UserEvent, UserStatus},
     State,
@@ -35,6 +41,7 @@ pub struct CreateUserRequest {
     pub is_admin: bool,
     #[oai(default)]
     pub language: LangId,
+    pub webhook_url: Option<String>,
 }
 
 /// User info for admin
@@ -91,13 +98,13 @@ impl ApiAdminUser {
         state: Data<&State>,
         token: Token,
         mut req: Json<CreateUserRequest>,
-    ) -> Result<CreateUserResponse<User>> {
+    ) -> Result<CreateUserResponse> {
         if !token.is_admin {
             return Err(Error::from_status(StatusCode::FORBIDDEN));
         }
 
         req.email.0 = req.email.0.to_lowercase();
-        let create_user = CreateUser::new(
+        let mut create_user = CreateUser::new(
             &req.name,
             CreateUserBy::Password {
                 email: &req.email,
@@ -108,6 +115,17 @@ impl ApiAdminUser {
         .gender(req.gender)
         .set_admin(req.is_admin)
         .language(&req.language);
+        if let Some(webhook_url) = &req.0.webhook_url {
+            // check the webhook url
+            if !matches!(
+                reqwest::get(webhook_url).await.map(|resp| resp.status()),
+                Ok(StatusCode::OK)
+            ) {
+                return Err(Error::from_status(StatusCode::BAD_REQUEST));
+            }
+
+            create_user = create_user.webhook_url(webhook_url);
+        }
         let res = state.create_user(create_user).await;
 
         match res {
@@ -332,6 +350,30 @@ impl ApiAdminUser {
             })));
 
         Ok(UpdateUserResponse::Ok(Json(cached_user.api_user(uid.0))))
+    }
+
+    /// Create a bot api-key for the user
+    #[oai(path = "/bot-api-key", method = "get")]
+    async fn create_bot_api_key(
+        &self,
+        state: Data<&State>,
+        token: Token,
+        uid: Query<i64>,
+    ) -> Result<Json<String>> {
+        if !token.is_admin {
+            return Err(Error::from_status(StatusCode::FORBIDDEN));
+        }
+
+        let cache = state.cache.read().await;
+        let user = cache
+            .users
+            .get(&uid)
+            .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+        if user.webhook_url.is_none() {
+            return Err(Error::from_status(StatusCode::BAD_REQUEST));
+        }
+        let api_key = create_api_key(token.uid, &state.0.key_config.read().await.server_key);
+        Ok(Json(api_key))
     }
 }
 

@@ -1,11 +1,12 @@
-use crate::{
-    api::{tags::ApiTags, token::Token},
-    State,
-};
 use chrono::Utc;
 use poem::{web::Data, Error, Result};
 use poem_openapi::{payload::Json, Object, OpenApi};
 use reqwest::StatusCode;
+
+use crate::{
+    api::{tags::ApiTags, token::Token},
+    State,
+};
 
 #[derive(Debug, Object)]
 struct CheckLicenseRequest {
@@ -73,7 +74,7 @@ impl ApiLicense {
     ) -> Result<Json<bool>> {
         let mut license_path = state.config.system.data_dir.clone();
         license_path.push("license");
-        //if !license_path.exists() || (token.is_some() && token.unwrap().is_admin) {
+        // if !license_path.exists() || (token.is_some() && token.unwrap().is_admin) {
         if !license_path.exists() || token.is_admin {
             crate::license::update_license(&state, &req.license)
                 .await
@@ -108,9 +109,10 @@ impl ApiLicense {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_harness::TestServer;
     use reqwest::StatusCode;
     use serde_json::json;
+
+    use crate::test_harness::TestServer;
 
     #[tokio::test]
     async fn test_check_license() {
@@ -170,8 +172,8 @@ mod tests {
     //     let admin_token = server.login_admin().await;
     //     for i in 0..30 {
     //         // user default limit: 20
-    //         server.create_user(&admin_token, format!("user{}@voce.chat", i)).await;
-    //     }
+    //         server.create_user(&admin_token, format!("user{}@voce.chat",
+    // i)).await;     }
     //
     //     let resp = server
     //         .post("/api/user/send_login_magic_link")

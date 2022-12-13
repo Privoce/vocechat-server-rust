@@ -41,7 +41,7 @@ impl MagicLinkToken {
                 is_confirmed,
                 gid,
                 code: code.to_string(),
-                expired_at: expired_at.timestamp(), // : (Utc::now() + Duration::seconds(expired_in)).timestamp()
+                expired_at: expired_at.timestamp(), /* : (Utc::now() + Duration::seconds(expired_in)).timestamp() */
                 extra_email,
                 extra_password,
             },

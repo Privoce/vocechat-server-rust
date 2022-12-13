@@ -89,6 +89,7 @@ pub struct CreateUser<'a> {
     language: Option<&'a LangId>,
     avatar: Option<&'a [u8]>,
     create_by: CreateUserBy<'a>,
+    webhook_url: Option<&'a str>,
 }
 
 impl<'a> CreateUser<'a> {
@@ -100,6 +101,7 @@ impl<'a> CreateUser<'a> {
             language: None,
             avatar: None,
             create_by,
+            webhook_url: None,
         }
     }
 
@@ -121,6 +123,13 @@ impl<'a> CreateUser<'a> {
     pub fn avatar(self, avatar: &'a [u8]) -> Self {
         Self {
             avatar: Some(avatar),
+            ..self
+        }
+    }
+
+    pub fn webhook_url(self, webhook_url: &'a str) -> Self {
+        Self {
+            webhook_url: Some(webhook_url),
             ..self
         }
     }
@@ -186,7 +195,7 @@ impl State {
         } else {
             DateTime::zero()
         };
-        let sql = "insert into user (name, password, email, gender, language, is_admin, create_by, avatar_updated_at, status, created_at, updated_at, is_guest) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        let sql = "insert into user (name, password, email, gender, language, is_admin, create_by, avatar_updated_at, status, created_at, updated_at, is_guest, webhook_url) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         let uid = sqlx::query(sql)
             .bind(create_user.name)
             .bind(password)
@@ -200,6 +209,7 @@ impl State {
             .bind(now)
             .bind(now)
             .bind(is_guest)
+            .bind(create_user.webhook_url)
             .execute(&mut tx)
             .await
             .map_err(InternalServerError)?
@@ -311,6 +321,7 @@ impl State {
                 read_index_group: Default::default(),
                 status: UserStatus::Normal,
                 is_guest,
+                webhook_url: None,
             },
         );
 

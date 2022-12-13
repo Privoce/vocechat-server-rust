@@ -677,9 +677,9 @@ impl ApiToken {
                 };
 
                 {
-                    /* let smtp_on = true;
-                    let cache = state.cache.read().await;
-                    let r = cache.codes.codes.get(&code);*/
+                    // let smtp_on = true;
+                    // let cache = state.cache.read().await;
+                    // let r = cache.codes.codes.get(&code);
                     if !state.magic_code_check_code(&code).await {
                         state.login_magic_code_remove(&code).await;
                         return Err(Error::from_string("Bad code.", StatusCode::BAD_REQUEST));

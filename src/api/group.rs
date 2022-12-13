@@ -1898,7 +1898,8 @@ mod tests {
     //         code: bool,
     //         token: String,
     //     }
-    //     let params = serde_urlencoded::from_str::<Params>(uri.query().unwrap()).unwrap();
+    //     let params =
+    // serde_urlencoded::from_str::<Params>(uri.query().unwrap()).unwrap();
     //     assert!(!params.code);
     //
     //     // register user

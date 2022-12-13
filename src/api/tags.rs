@@ -46,4 +46,7 @@ pub enum ApiTags {
 
     /// Google auth management operations
     AdminGithubAuth,
+
+    /// Bot operations
+    Bot,
 }

@@ -1,6 +1,7 @@
-use crate::api::Token;
 use poem::{http::StatusCode, Endpoint, EndpointExt, Error};
 use poem_openapi::{ApiExtractor, ExtractParamOptions};
+
+use crate::api::Token;
 
 pub fn guest_forbidden(ep: impl Endpoint) -> impl Endpoint {
     ep.before(|req| async move {

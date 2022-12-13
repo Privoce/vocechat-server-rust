@@ -1,8 +1,10 @@
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use pkcs1::EncodeRsaPrivateKey;
-use rsa::pkcs1::{EncodeRsaPublicKey, LineEnding};
-use rsa::{PaddingScheme, PublicKey, RsaPrivateKey, RsaPublicKey};
+use rsa::{
+    pkcs1::{EncodeRsaPublicKey, LineEnding},
+    PaddingScheme, PublicKey, RsaPrivateKey, RsaPublicKey,
+};
 
 #[derive(Debug)]
 pub struct License {
@@ -170,8 +172,9 @@ pub fn rsa_check_license(license: &License, public_key_pem: &str) -> Result<()> 
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use std::ops::Add;
+
+    use super::*;
 
     #[test]
     fn test_license() {
@@ -251,8 +254,10 @@ dnwtOymXGQpaS/Vfo0q1kGzZoXsCx3v7BQIDAQAB
         let license = licensegen.gen("www.domain.com|www.domain2.com", expired_at, 20);
 
         let license_bs58 = license.to_string();
-        //dbg!(license_bs58);
-        // assert_eq!(&license_bs58, "2RvN4krfyQbvuLcXzz4PwoJfckRFptqLKKXSP7f4Np7AGqgixrfdUzZ5qk2iT2gFwCntivyYnSaumyao7QF2SfQ3TKyLAgGDYeYeJcbBri9re5esG2PMrxZBjq68eR94yYqdTg6LAP9oc5WtLAaBX25RkVu2zt59kdgRzk5CbnnmZnMAHgZEDnsVJfCQa6HKnb3p1cpZa6LTANrKh1VuvCAerdCHCoc1YHNwUipg5JJXmxJQadFShv1sYREUHHzLuPMb8xHb7GkPJ6MJpQBzHfDnTySRG7BGxNz5GKCutFp1o7YjkQqZvKBTvWQ8ic4HmbHErLHw4aJ5CAMyugX4v2GAgxS8Z4zi9tjdzRtbbqzncnXSNBTumBxobBskNAbEaQC9HgBavgcAw4wHrHSyG3v2rTdsDUJZgTtanEfxnxZhSpKtXZRFzVNdjmo66GeLhvWwMZSXKzH89uTvMcEokmbUyLz9mKXzRP9dhTJ4bC6YWNrbDueYX9pqrsmXm3Z4aYP7DjknXwPCMKZbsCXZi2YQVUjggCyRarR4eThY6gZ8iWGkvi1ybAADooh8KXSAFNGSRRTGC5La6Atug7y6e6QnFmaRndLHdCyxqyq9LM1Ly2icYAFa2ZspXyL3MyBTLFvgQeqTmL1KQVHzhjwtkTvcFsUxScYNXhVgCkyD5vkSZpcwixGJYyYtkrF27XpMcq8mR6dAyi3Zqt2w68X3xA748a8ofky1KYwHmA1U4BaDpXbbVKSu6wtonMhzvQ6xMssyWJVhrzeymPnMwM8Xiut3pZcpC77Ri");
+        // dbg!(license_bs58);
+        // assert_eq!(&license_bs58,
+        // "2RvN4krfyQbvuLcXzz4PwoJfckRFptqLKKXSP7f4Np7AGqgixrfdUzZ5qk2iT2gFwCntivyYnSaumyao7QF2SfQ3TKyLAgGDYeYeJcbBri9re5esG2PMrxZBjq68eR94yYqdTg6LAP9oc5WtLAaBX25RkVu2zt59kdgRzk5CbnnmZnMAHgZEDnsVJfCQa6HKnb3p1cpZa6LTANrKh1VuvCAerdCHCoc1YHNwUipg5JJXmxJQadFShv1sYREUHHzLuPMb8xHb7GkPJ6MJpQBzHfDnTySRG7BGxNz5GKCutFp1o7YjkQqZvKBTvWQ8ic4HmbHErLHw4aJ5CAMyugX4v2GAgxS8Z4zi9tjdzRtbbqzncnXSNBTumBxobBskNAbEaQC9HgBavgcAw4wHrHSyG3v2rTdsDUJZgTtanEfxnxZhSpKtXZRFzVNdjmo66GeLhvWwMZSXKzH89uTvMcEokmbUyLz9mKXzRP9dhTJ4bC6YWNrbDueYX9pqrsmXm3Z4aYP7DjknXwPCMKZbsCXZi2YQVUjggCyRarR4eThY6gZ8iWGkvi1ybAADooh8KXSAFNGSRRTGC5La6Atug7y6e6QnFmaRndLHdCyxqyq9LM1Ly2icYAFa2ZspXyL3MyBTLFvgQeqTmL1KQVHzhjwtkTvcFsUxScYNXhVgCkyD5vkSZpcwixGJYyYtkrF27XpMcq8mR6dAyi3Zqt2w68X3xA748a8ofky1KYwHmA1U4BaDpXbbVKSu6wtonMhzvQ6xMssyWJVhrzeymPnMwM8Xiut3pZcpC77Ri"
+        // );
 
         let license = License::from_string(license_bs58).unwrap();
         // dbg!(license.domain);

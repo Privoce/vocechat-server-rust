@@ -1,6 +1,7 @@
 #![allow(clippy::large_enum_variant)]
 
 mod api;
+mod api_key;
 mod config;
 mod create_user;
 mod license;

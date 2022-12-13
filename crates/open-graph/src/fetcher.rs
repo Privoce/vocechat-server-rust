@@ -17,8 +17,9 @@ use reqwest;
 use crate::{error::Error, Audio, Image, Object, Video};
 
 fn gz_decode(data: &[u8]) -> Result<String, Error> {
-    use flate2::read::GzDecoder;
     use std::io::prelude::*;
+
+    use flate2::read::GzDecoder;
     let mut d = GzDecoder::new(data);
     let mut s = String::new();
     d.read_to_string(&mut s)?;

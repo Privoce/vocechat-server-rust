@@ -17,7 +17,7 @@ anyhow = "1.0.51"
 chrono = { version = "0.4.19", features = ["serde"] }
 fnv = "1.0.7"
 hex = "0.4.3"
-poem = { version = "1.3.40", features = [
+poem = { version = "1.3.50", features = [
     "rustls",
     "sse",
     "static-files",
@@ -27,7 +27,7 @@ poem = { version = "1.3.40", features = [
     "acme",
     'tokio-metrics',
 ] }
-poem-openapi = { version = "2.0.19", features = [
+poem-openapi = { version = "2.0.21", features = [
     "rapidoc",
     "swagger-ui",
     "redoc",
@@ -83,8 +83,8 @@ sha2 = "0.9.0"
 substring = "1.4.5"
 regex = "1.5.4"
 jsonwebtoken = "8.0.1"
-#openidconnect = "2.2.0"
-openidconnect = { git = "https://github.com/sunli829/openidconnect-rs", rev = "efd006c" }
+openidconnect = "2.4.0"
+#openidconnect = { git = "https://github.com/sunli829/openidconnect-rs", rev = "efd006c" }
 bytes = "1.1.0"
 textnonce = "1.0.0"
 web3 = { version = "0.18.0", default-features = false, features = ["signing"] }
