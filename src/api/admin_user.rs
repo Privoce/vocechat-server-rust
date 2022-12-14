@@ -75,6 +75,7 @@ pub struct UpdateUserRequest {
     is_admin: Option<bool>,
     language: Option<LangId>,
     status: Option<UserStatus>,
+    webhook_url: Option<String>,
 }
 
 impl UpdateUserRequest {
@@ -86,6 +87,7 @@ impl UpdateUserRequest {
             && self.is_admin.is_none()
             && self.language.is_none()
             && self.status.is_none()
+            && self.webhook_url.is_none()
     }
 }
 
@@ -227,6 +229,17 @@ impl ApiAdminUser {
             }
         }
 
+        // check webhook url
+        if let Some(webhook_url) = &req.webhook_url {
+            // check the webhook url
+            if !matches!(
+                reqwest::get(webhook_url).await.map(|resp| resp.status()),
+                Ok(StatusCode::OK)
+            ) {
+                return Err(Error::from_status(StatusCode::BAD_REQUEST));
+            }
+        }
+
         let now = DateTime::now();
         let cached_user = cache
             .users
@@ -248,6 +261,7 @@ impl ApiAdminUser {
                 .chain(req.language.iter().map(|_| "language = ?"))
                 .chain(req.is_admin.iter().map(|_| "is_admin = ?"))
                 .chain(req.status.iter().map(|_| "status = ?"))
+                .chain(req.webhook_url.iter().map(|_| "webhook_url = ?"))
                 .chain(Some("updated_at = ?"))
                 .join(", ")
         );
@@ -273,6 +287,9 @@ impl ApiAdminUser {
         }
         if let Some(status) = &req.status {
             query = query.bind(i8::from(*status));
+        }
+        if let Some(webhook_url) = &req.webhook_url {
+            query = query.bind(webhook_url);
         }
 
         query
@@ -322,8 +339,11 @@ impl ApiAdminUser {
         if let Some(status) = &req.0.status {
             cached_user.status = *status;
         }
+        if let Some(webhook_url) = req.0.webhook_url {
+            cached_user.webhook_url = Some(webhook_url);
+        }
 
-        if let Some(UserStatus::Frozen) = req.status {
+        if let Some(UserStatus::Frozen) = req.0.status {
             // close all subscriptions
             for device in cached_user.devices.values_mut() {
                 if let Some(sender) = device.sender.take() {
