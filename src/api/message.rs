@@ -328,6 +328,7 @@ pub struct UserUpdateLog {
     pub gender: Option<i32>,
     pub language: Option<LangId>,
     pub is_admin: Option<bool>,
+    pub is_bot: Option<bool>,
     pub avatar_updated_at: Option<DateTime>,
 }
 

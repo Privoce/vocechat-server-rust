@@ -42,6 +42,7 @@ pub struct CreateUserRequest {
     #[oai(default)]
     pub language: LangId,
     pub webhook_url: Option<String>,
+    pub is_bot: bool,
 }
 
 /// User info for admin
@@ -62,6 +63,8 @@ pub struct User {
     pub updated_at: DateTime,
     pub avatar_updated_at: DateTime,
     pub status: UserStatus,
+    pub webhook_url: Option<String>,
+    pub is_bot: bool,
 }
 
 /// Update user request
@@ -116,7 +119,9 @@ impl ApiAdminUser {
         )
         .gender(req.gender)
         .set_admin(req.is_admin)
-        .language(&req.language);
+        .language(&req.language)
+        .set_bot(req.is_bot);
+
         if let Some(webhook_url) = &req.0.webhook_url {
             // check the webhook url
             if !matches!(
@@ -366,6 +371,7 @@ impl ApiAdminUser {
                 gender: req.0.gender,
                 language: req.0.language,
                 is_admin: req.0.is_admin,
+                is_bot: None,
                 avatar_updated_at: None,
             })));
 

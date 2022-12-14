@@ -63,6 +63,8 @@ pub struct UserInfo {
     #[oai(read_only)]
     pub is_admin: bool,
     #[oai(read_only)]
+    pub is_bot: bool,
+    #[oai(read_only)]
     pub avatar_updated_at: DateTime,
     #[oai(read_only)]
     pub create_by: String,
@@ -792,6 +794,7 @@ impl ApiUser {
                     gender: req.0.gender,
                     language: req.0.language,
                     is_admin: None,
+                    is_bot: None,
                     avatar_updated_at: None,
                 })));
         }
@@ -869,6 +872,7 @@ impl ApiUser {
                 gender: None,
                 language: None,
                 is_admin: None,
+                is_bot: None,
                 avatar_updated_at: Some(now),
             })));
 
@@ -1471,7 +1475,7 @@ async fn fetch_user_log(
 ) -> Result<Option<Message>> {
     match users_version {
         Some(users_version) => {
-            let sql = "select id, uid, action, email, name, gender, language, is_admin, avatar_updated_at from user_log where id > ?";
+            let sql = "select id, uid, action, email, name, gender, language, is_admin, is_bot, avatar_updated_at from user_log where id > ?";
             let mut stream = sqlx::query_as::<
                 _,
                 (
@@ -1483,6 +1487,7 @@ async fn fetch_user_log(
                     Option<i32>,
                     Option<LangId>,
                     Option<bool>,
+                    Option<bool>,
                     Option<DateTime>,
                 ),
             >(sql)
@@ -1491,8 +1496,18 @@ async fn fetch_user_log(
 
             let mut logs = Vec::new();
             while let Some(res) = stream.next().await {
-                let (id, uid, action, email, name, gender, language, is_admin, avatar_updated_at) =
-                    res.map_err(InternalServerError)?;
+                let (
+                    id,
+                    uid,
+                    action,
+                    email,
+                    name,
+                    gender,
+                    language,
+                    is_admin,
+                    is_bot,
+                    avatar_updated_at,
+                ) = res.map_err(InternalServerError)?;
                 let log = UserUpdateLog {
                     log_id: id,
                     action,
@@ -1502,6 +1517,7 @@ async fn fetch_user_log(
                     gender,
                     language,
                     is_admin,
+                    is_bot,
                     avatar_updated_at,
                 };
                 logs.push(log);
