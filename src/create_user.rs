@@ -90,6 +90,7 @@ pub struct CreateUser<'a> {
     avatar: Option<&'a [u8]>,
     create_by: CreateUserBy<'a>,
     webhook_url: Option<&'a str>,
+    is_bot: bool,
 }
 
 impl<'a> CreateUser<'a> {
@@ -102,6 +103,7 @@ impl<'a> CreateUser<'a> {
             avatar: None,
             create_by,
             webhook_url: None,
+            is_bot: false,
         }
     }
 
@@ -111,6 +113,10 @@ impl<'a> CreateUser<'a> {
 
     pub fn set_admin(self, is_admin: bool) -> Self {
         Self { is_admin, ..self }
+    }
+
+    pub fn set_bot(self, is_bot: bool) -> Self {
+        Self { is_bot, ..self }
     }
 
     pub fn language(self, language: &'a LangId) -> Self {
@@ -195,7 +201,7 @@ impl State {
         } else {
             DateTime::zero()
         };
-        let sql = "insert into user (name, password, email, gender, language, is_admin, create_by, avatar_updated_at, status, created_at, updated_at, is_guest, webhook_url) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        let sql = "insert into user (name, password, email, gender, language, is_admin, create_by, avatar_updated_at, status, created_at, updated_at, is_guest, webhook_url, is_bot) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         let uid = sqlx::query(sql)
             .bind(create_user.name)
             .bind(password)
@@ -210,6 +216,7 @@ impl State {
             .bind(now)
             .bind(is_guest)
             .bind(create_user.webhook_url)
+            .bind(create_user.is_bot)
             .execute(&mut tx)
             .await
             .map_err(InternalServerError)?
@@ -322,6 +329,7 @@ impl State {
                 status: UserStatus::Normal,
                 is_guest,
                 webhook_url: None,
+                is_bot: create_user.is_bot,
             },
         );
 
@@ -338,6 +346,7 @@ impl State {
                     gender: create_user.gender.into(),
                     language: Some(language.clone()),
                     is_admin: Some(create_user.is_admin),
+                    is_bot: Some(create_user.is_bot),
                     avatar_updated_at: Some(avatar_updated_at),
                 })));
 

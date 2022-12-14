@@ -130,6 +130,7 @@ pub struct CacheUser {
     pub status: UserStatus,
     pub is_guest: bool,
     pub webhook_url: Option<String>,
+    pub is_bot: bool,
 }
 
 impl CacheUser {
@@ -145,6 +146,7 @@ impl CacheUser {
             gender: self.gender,
             language: self.language.clone(),
             is_admin: self.is_admin,
+            is_bot: self.is_bot,
             avatar_updated_at: self.avatar_updated_at,
             create_by: self.create_by.clone(),
         }
@@ -174,6 +176,8 @@ impl CacheUser {
             updated_at: self.updated_at,
             avatar_updated_at: self.avatar_updated_at,
             status: self.status,
+            webhook_url: self.webhook_url.clone(),
+            is_bot: self.is_bot,
         }
     }
 
@@ -393,7 +397,7 @@ pub struct State {
 impl State {
     pub async fn load_users_cache(db: &SqlitePool) -> sqlx::Result<BTreeMap<i64, CacheUser>> {
         let mut users = BTreeMap::new();
-        let sql = "select uid, email, name, password, gender, is_admin, language, create_by, created_at, updated_at, avatar_updated_at, status, is_guest, webhook_url from user";
+        let sql = "select uid, email, name, password, gender, is_admin, language, create_by, created_at, updated_at, avatar_updated_at, status, is_guest, webhook_url, is_bot from user";
         let mut stream = sqlx::query_as::<
             _,
             (
@@ -411,6 +415,7 @@ impl State {
                 i8,
                 bool,
                 Option<String>,
+                bool,
             ),
         >(sql)
         .fetch(db);
@@ -430,6 +435,7 @@ impl State {
                 status,
                 is_guest,
                 webhook_url,
+                is_bot,
             ) = res?;
 
             let devices = sqlx::query_as::<_, (String, Option<String>)>(
@@ -532,6 +538,7 @@ impl State {
                     status: status.into(),
                     is_guest,
                     webhook_url,
+                    is_bot,
                 },
             );
         }
@@ -1112,6 +1119,7 @@ impl State {
                     gender: None,
                     language: None,
                     is_admin: None,
+                    is_bot: None,
                     avatar_updated_at: None,
                 })));
 
