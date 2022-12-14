@@ -284,7 +284,7 @@ impl State {
 
         let log_id = if !is_guest {
             // insert into user_log table
-            let sql = "insert into user_log (uid, action, email, name, gender, language, avatar_updated_at, is_admin) values (?, ?, ?, ?, ?, ?, ?, ?)";
+            let sql = "insert into user_log (uid, action, email, name, gender, language, avatar_updated_at, is_admin, is_bot) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             let log_id = sqlx::query(sql)
                 .bind(uid)
                 .bind(UpdateAction::Create)
@@ -294,6 +294,7 @@ impl State {
                 .bind(&language)
                 .bind(avatar_updated_at)
                 .bind(create_user.is_admin)
+                .bind(create_user.is_bot)
                 .execute(&mut tx)
                 .await
                 .map_err(InternalServerError)?
