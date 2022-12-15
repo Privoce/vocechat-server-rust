@@ -128,7 +128,7 @@ impl ApiAdminUser {
                 reqwest::get(webhook_url).await.map(|resp| resp.status()),
                 Ok(StatusCode::OK)
             ) {
-                return Err(Error::from_status(StatusCode::BAD_REQUEST));
+                return Ok(CreateUserResponse::InvalidWebhookUrl);
             }
 
             create_user = create_user.webhook_url(webhook_url);
@@ -241,7 +241,7 @@ impl ApiAdminUser {
                 reqwest::get(webhook_url).await.map(|resp| resp.status()),
                 Ok(StatusCode::OK)
             ) {
-                return Err(Error::from_status(StatusCode::BAD_REQUEST));
+                return Ok(UpdateUserResponse::InvalidWebhookUrl);
             }
         }
 

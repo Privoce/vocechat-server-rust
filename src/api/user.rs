@@ -95,6 +95,10 @@ impl UpdateUserInfoRequest {
 pub enum UpdateUserResponse<T: ToJSON> {
     #[oai(status = 200)]
     Ok(Json<T>),
+    /// Invalid webhook url
+    #[oai(status = 406)]
+    InvalidWebhookUrl,
+    /// User conflict
     #[oai(status = 409)]
     Conflict(Json<UserConflict>),
 }
@@ -249,6 +253,10 @@ pub struct UserConflict {
 pub enum CreateUserResponse {
     #[oai(status = 200)]
     Ok(Json<User>),
+    /// Invalid webhook url
+    #[oai(status = 406)]
+    InvalidWebhookUrl,
+    /// User conflict
     #[oai(status = 409)]
     Conflict(Json<UserConflict>),
 }
