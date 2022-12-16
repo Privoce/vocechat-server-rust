@@ -1,7 +1,12 @@
 use std::sync::Arc;
 
 use itertools::Itertools;
-use poem::{error::InternalServerError, http::StatusCode, web::Data, Error, Result};
+use poem::{
+    error::{InternalServerError, ReadBodyError},
+    http::StatusCode,
+    web::Data,
+    Error, Result,
+};
 use poem_openapi::{
     param::{Path, Query},
     payload::Json,
@@ -11,8 +16,11 @@ use poem_openapi::{
 
 use crate::{
     api::{
-        tags::ApiTags, token::Token, CreateUserConflictReason, CreateUserResponse, DateTime,
-        KickReason, LangId, UpdateAction, UpdateUserResponse, UserConflict, UserUpdateLog,
+        tags::ApiTags,
+        token::Token,
+        user::{UploadAvatarApiResponse, UploadAvatarRequest},
+        CreateUserConflictReason, CreateUserResponse, DateTime, KickReason, LangId, UpdateAction,
+        UpdateUserResponse, UserConflict, UserUpdateLog,
     },
     api_key::create_api_key,
     create_user::{CreateUser, CreateUserBy, CreateUserError},
@@ -376,6 +384,86 @@ impl ApiAdminUser {
             })));
 
         Ok(UpdateUserResponse::Ok(Json(cached_user.api_user(uid.0))))
+    }
+
+    /// Upload avatar
+    #[oai(path = "/:uid/avatar", method = "post")]
+    async fn upload_avatar(
+        &self,
+        state: Data<&State>,
+        token: Token,
+        uid: Path<i64>,
+        req: UploadAvatarRequest,
+    ) -> Result<UploadAvatarApiResponse> {
+        if !token.is_admin {
+            return Err(Error::from_status(StatusCode::FORBIDDEN));
+        }
+
+        let mut cache = state.cache.write().await;
+        let now = DateTime::now();
+        let cached_user = cache
+            .users
+            .get_mut(&uid)
+            .ok_or_else(|| Error::from(StatusCode::UNAUTHORIZED))?;
+
+        let UploadAvatarRequest::Image(data) = req;
+        let data = match data
+            .0
+            .into_bytes_limit(state.config.system.upload_avatar_limit)
+            .await
+        {
+            Ok(data) => data,
+            Err(ReadBodyError::PayloadTooLarge) => {
+                return Ok(UploadAvatarApiResponse::PayloadTooLarge);
+            }
+            Err(err) => return Err(err.into()),
+        };
+
+        // write to file
+        state.save_avatar(uid.0, &data)?;
+
+        // update sqlite
+        let mut tx = state.db_pool.begin().await.map_err(InternalServerError)?;
+
+        sqlx::query("update user set avatar_updated_at = ? where uid = ?")
+            .bind(now)
+            .bind(uid.0)
+            .execute(&mut tx)
+            .await
+            .map_err(InternalServerError)?;
+
+        let log_id =
+            sqlx::query("insert into user_log (uid, action, avatar_updated_at) values (?, ?, ?)")
+                .bind(uid.0)
+                .bind(UpdateAction::Update)
+                .bind(now)
+                .execute(&mut tx)
+                .await
+                .map_err(InternalServerError)?
+                .last_insert_rowid();
+
+        tx.commit().await.map_err(InternalServerError)?;
+
+        // update cache
+        cached_user.avatar_updated_at = now;
+
+        // broadcast event
+        let _ = state
+            .event_sender
+            .send(Arc::new(BroadcastEvent::UserLog(UserUpdateLog {
+                log_id,
+                action: UpdateAction::Update,
+                uid: uid.0,
+                email: None,
+                name: None,
+                gender: None,
+                language: None,
+                is_admin: None,
+                is_bot: None,
+                avatar_updated_at: Some(now),
+            })));
+
+        Ok(UploadAvatarApiResponse::Ok)
     }
 
     /// Create a bot api-key for the user
