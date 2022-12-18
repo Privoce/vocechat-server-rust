@@ -272,6 +272,7 @@ fn main() {
                     tokio::time::sleep(Duration::from_secs(30)).await;
                     state.magic_code_clean().await;
                     state.clean_mute().await;
+                    state.sync_bot_key_last_used().await;
 
                     tokio::task::spawn_blocking({
                         let state = state.clone();
@@ -334,7 +335,7 @@ async fn update_webclient(state: &State) {
 
     let wwwroot_dir = state.config.system.wwwroot_dir();
     if wwwroot_dir.exists() {
-        current_hash = std::fs::read_to_string(&wwwroot_dir.join(".hash")).ok();
+        current_hash = std::fs::read_to_string(wwwroot_dir.join(".hash")).ok();
     }
 
     let hash_url = format!("{}/web.vocechat.md5", webclient_url);

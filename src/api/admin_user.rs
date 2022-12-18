@@ -7,12 +7,7 @@ use poem::{
     web::Data,
     Error, Result,
 };
-use poem_openapi::{
-    param::{Path, Query},
-    payload::Json,
-    types::Email,
-    Object, OpenApi,
-};
+use poem_openapi::{param::Path, payload::Json, types::Email, ApiResponse, Object, OpenApi};
 
 use crate::{
     api::{
@@ -24,7 +19,7 @@ use crate::{
     },
     api_key::create_api_key,
     create_user::{CreateUser, CreateUserBy, CreateUserError},
-    state::{BroadcastEvent, UserEvent, UserStatus},
+    state::{BotKey, BroadcastEvent, UserEvent, UserStatus},
     State,
 };
 
@@ -100,6 +95,48 @@ impl UpdateUserRequest {
             && self.status.is_none()
             && self.webhook_url.is_none()
     }
+}
+
+/// Create bot api key request
+#[derive(Debug, Object)]
+pub struct CreateBotApiKeyRequest {
+    name: String,
+}
+
+/// Create bot api key response
+#[derive(Debug, ApiResponse)]
+pub enum CreateBotApiKeyResponse {
+    #[oai(status = 200)]
+    Ok(Json<String>),
+    /// Key name conflict
+    #[oai(status = 409)]
+    ConflictName,
+}
+
+/// Delete bot api key request
+#[derive(Debug, Object)]
+pub struct DeleteBotApiKeyRequest {
+    uid: i64,
+}
+
+/// Delete bot api key response
+#[derive(Debug, ApiResponse)]
+pub enum DeleteBotApiKeyResponse {
+    #[oai(status = 200)]
+    Ok,
+    /// Key not found
+    #[oai(status = 404)]
+    KeyNotFound,
+}
+
+#[derive(Debug, Object)]
+#[oai(rename = "BotKey")]
+pub struct BotKeyInfo {
+    pub id: i64,
+    pub name: String,
+    pub key: String,
+    pub created_at: DateTime,
+    pub last_used: Option<DateTime>,
 }
 
 #[OpenApi(prefix_path = "/admin/user", tag = "ApiTags::AdminUser")]
@@ -466,14 +503,105 @@ impl ApiAdminUser {
         Ok(UploadAvatarApiResponse::Ok)
     }
 
-    /// Create a bot api-key for the user
-    #[oai(path = "/bot-api-key", method = "get")]
+    /// Create a bot api-key
+    #[oai(path = "/bot-api-key/:uid", method = "post")]
     async fn create_bot_api_key(
         &self,
         state: Data<&State>,
         token: Token,
-        uid: Query<i64>,
-    ) -> Result<Json<String>> {
+        uid: Path<i64>,
+        req: Json<CreateBotApiKeyRequest>,
+    ) -> Result<CreateBotApiKeyResponse> {
+        if !token.is_admin {
+            return Err(Error::from_status(StatusCode::FORBIDDEN));
+        }
+
+        let mut cache = state.cache.write().await;
+        let user = cache
+            .users
+            .get_mut(&uid)
+            .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+
+        if user
+            .bot_keys
+            .values()
+            .any(|bot_key| bot_key.name == req.name)
+        {
+            return Ok(CreateBotApiKeyResponse::ConflictName);
+        }
+
+        let api_key = create_api_key(uid.0, &state.0.key_config.read().await.server_key);
+
+        // update sqlite
+        let now = DateTime::now();
+        let key_id =
+            sqlx::query("insert into `bot_key` (uid, name, key, created_at) values (?, ?, ?, ?)")
+                .bind(uid.0)
+                .bind(&req.name)
+                .bind(&api_key)
+                .bind(now)
+                .execute(&state.db_pool)
+                .await
+                .map_err(InternalServerError)?
+                .last_insert_rowid();
+
+        // update cache
+        user.bot_keys.insert(
+            key_id,
+            BotKey {
+                name: req.0.name,
+                key: api_key.clone(),
+                created_at: now,
+                last_used: None,
+            },
+        );
+
+        Ok(CreateBotApiKeyResponse::Ok(Json(api_key)))
+    }
+
+    /// Delete a bot api-key
+    #[oai(path = "/bot-api-key/:uid/:kid", method = "delete")]
+    async fn delete_bot_api_key(
+        &self,
+        state: Data<&State>,
+        token: Token,
+        uid: Path<i64>,
+        kid: Path<i64>,
+    ) -> Result<DeleteBotApiKeyResponse> {
+        if !token.is_admin {
+            return Err(Error::from_status(StatusCode::FORBIDDEN));
+        }
+
+        let mut cache = state.cache.write().await;
+        let user = cache
+            .users
+            .get_mut(&uid)
+            .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+
+        if !user.bot_keys.contains_key(&kid) {
+            return Ok(DeleteBotApiKeyResponse::KeyNotFound);
+        }
+
+        // update sqlite
+        sqlx::query("delete from `bot_key` where id = ?")
+            .bind(kid.0)
+            .execute(&state.db_pool)
+            .await
+            .map_err(InternalServerError)?;
+
+        // update cache
+        user.bot_keys.remove(&kid);
+        Ok(DeleteBotApiKeyResponse::Ok)
+    }
+
+    /// List bot api-key
+    #[oai(path = "/bot-api-key/:uid", method = "get")]
+    async fn list_bot_api_key(
+        &self,
+        state: Data<&State>,
+        token: Token,
+        uid: Path<i64>,
+    ) -> Result<Json<Vec<BotKeyInfo>>> {
         if !token.is_admin {
             return Err(Error::from_status(StatusCode::FORBIDDEN));
         }
@@ -483,11 +611,19 @@ impl ApiAdminUser {
             .users
             .get(&uid)
             .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
-        if user.webhook_url.is_none() {
-            return Err(Error::from_status(StatusCode::BAD_REQUEST));
-        }
-        let api_key = create_api_key(token.uid, &state.0.key_config.read().await.server_key);
-        Ok(Json(api_key))
+
+        Ok(Json(
+            user.bot_keys
+                .iter()
+                .map(|(kid, bot_key)| BotKeyInfo {
+                    id: *kid,
+                    name: bot_key.name.clone(),
+                    key: bot_key.key.clone(),
+                    created_at: bot_key.created_at,
+                    last_used: bot_key.last_used,
+                })
+                .collect(),
+        ))
     }
 }
 

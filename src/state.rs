@@ -8,7 +8,7 @@ use std::{
 };
 
 use chrono::{NaiveDate, Utc};
-use futures_util::StreamExt;
+use futures_util::{StreamExt, TryStreamExt};
 use itertools::Itertools;
 use num_enum::{FromPrimitive, IntoPrimitive};
 use openidconnect::{core::CoreClient, CsrfToken, Nonce, PkceCodeVerifier};
@@ -109,6 +109,14 @@ pub enum UserStatus {
 }
 
 #[derive(Debug)]
+pub struct BotKey {
+    pub name: String,
+    pub key: String,
+    pub created_at: DateTime,
+    pub last_used: Option<DateTime>,
+}
+
+#[derive(Debug)]
 pub struct CacheUser {
     pub email: Option<String>,
     pub name: String,
@@ -131,6 +139,7 @@ pub struct CacheUser {
     pub is_guest: bool,
     pub webhook_url: Option<String>,
     pub is_bot: bool,
+    pub bot_keys: HashMap<i64, BotKey>,
 }
 
 impl CacheUser {
@@ -515,6 +524,25 @@ impl State {
                 }
             }
 
+            let sql = "select id, name, key, created_at, last_used from `bot_key` where uid = ?";
+            let bot_keys =
+                sqlx::query_as::<_, (i64, String, String, DateTime, Option<DateTime>)>(sql)
+                    .bind(uid)
+                    .fetch(db)
+                    .map_ok(|(id, name, key, created_at, last_used)| {
+                        (
+                            id,
+                            BotKey {
+                                name,
+                                key,
+                                created_at,
+                                last_used,
+                            },
+                        )
+                    })
+                    .try_collect()
+                    .await?;
+
             users.insert(
                 uid,
                 CacheUser {
@@ -539,6 +567,7 @@ impl State {
                     is_guest,
                     webhook_url,
                     is_bot,
+                    bot_keys,
                 },
             );
         }
@@ -844,6 +873,30 @@ impl State {
             for gid in &gid_list {
                 user.mute_group.remove(gid);
             }
+        }
+    }
+
+    pub async fn sync_bot_key_last_used(&self) {
+        async fn internal_sync_bot_key_last_used(state: &State) -> anyhow::Result<()> {
+            let cache = state.cache.read().await;
+            let mut tx = state.db_pool.begin().await?;
+
+            for user in cache.users.values() {
+                for (id, bot_key) in &user.bot_keys {
+                    sqlx::query("update `bot_key` set last_used = ? where id = ?")
+                        .bind(bot_key.last_used)
+                        .bind(id)
+                        .execute(&mut tx)
+                        .await?;
+                }
+            }
+
+            tx.commit().await?;
+            Ok(())
+        }
+
+        if let Err(err) = internal_sync_bot_key_last_used(self).await {
+            tracing::error!(error = %err, "failed to write last used of bot key");
         }
     }
 
@@ -1298,7 +1351,7 @@ fn clean_file_dir(now: NaiveDate, path: &Path, expiry_days: i64) {
     }
 
     for p in remove_dirs {
-        let _ = std::fs::remove_dir_all(&p);
+        let _ = std::fs::remove_dir_all(p);
     }
 }
 
@@ -1481,7 +1534,7 @@ mod tests {
                     .join(format!("{}", year))
                     .join(format!("{}", month))
                     .join(format!("{}", day));
-                let _ = std::fs::create_dir_all(&dpath);
+                let _ = std::fs::create_dir_all(dpath);
             }
         }
 

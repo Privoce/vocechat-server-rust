@@ -331,6 +331,7 @@ impl State {
                 is_guest,
                 webhook_url: None,
                 is_bot: create_user.is_bot,
+                bot_keys: Default::default(),
             },
         );
 

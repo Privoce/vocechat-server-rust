@@ -10,11 +10,26 @@ use crate::{
         group::get_related_groups,
         message::{parse_properties_from_base64, send_message, SendMessageRequest},
         tags::ApiTags,
-        Group, MessageTarget,
+        DateTime, Group, MessageTarget,
     },
     api_key::parse_api_key,
     state::State,
 };
+
+async fn check_api_key(state: &State, uid: i64, key: &str) -> Result<()> {
+    let mut cache = state.cache.write().await;
+    let bot_key = cache
+        .users
+        .get_mut(&uid)
+        .and_then(|user| {
+            user.bot_keys
+                .values_mut()
+                .find(|bot_key| bot_key.key == key)
+        })
+        .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+    bot_key.last_used = Some(DateTime::now());
+    Ok(())
+}
 
 pub struct ApiBot;
 
@@ -30,6 +45,7 @@ impl ApiBot {
     ) -> Result<Json<Vec<Group>>> {
         let current_uid = parse_api_key(&api_key, &state.0.key_config.read().await.server_key)
             .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+        check_api_key(&state, current_uid, &api_key).await?;
         let cache = state.cache.read().await;
         Ok(Json(get_related_groups(
             &cache.groups,
@@ -50,6 +66,7 @@ impl ApiBot {
     ) -> Result<Json<i64>> {
         let current_uid = parse_api_key(&api_key, &state.0.key_config.read().await.server_key)
             .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+        check_api_key(&state, current_uid, &api_key).await?;
         let properties = parse_properties_from_base64(properties.0);
         let payload = req
             .into_chat_message_payload(&state, current_uid, MessageTarget::user(uid.0), properties)
@@ -70,6 +87,7 @@ impl ApiBot {
     ) -> Result<Json<i64>> {
         let current_uid = parse_api_key(&api_key, &state.0.key_config.read().await.server_key)
             .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+        check_api_key(&state, current_uid, &api_key).await?;
         let properties = parse_properties_from_base64(properties.0);
         let payload = req
             .into_chat_message_payload(&state, current_uid, MessageTarget::group(gid.0), properties)

@@ -117,7 +117,7 @@ async fn internal_create_message_archive(
                     .config
                     .system
                     .avatar_dir()
-                    .join(&format!("{}.png", merged_payload.from_uid));
+                    .join(format!("{}.png", merged_payload.from_uid));
                 let avatar_data = tokio::fs::read(avatar_path).await.ok();
                 let avatar = avatar_data.map(|avatar_data| {
                     files.push(ArchiveFile {

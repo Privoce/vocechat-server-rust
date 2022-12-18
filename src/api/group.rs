@@ -1025,7 +1025,7 @@ impl ApiGroup {
             .event_sender
             .send(Arc::new(BroadcastEvent::PinnedMessageUpdated {
                 targets: if group.ty.is_public() {
-                    cache.users.iter().map(|(uid, _)| *uid).collect()
+                    cache.users.keys().copied().collect()
                 } else {
                     group.members.clone()
                 },
@@ -1089,7 +1089,7 @@ impl ApiGroup {
             .event_sender
             .send(Arc::new(BroadcastEvent::PinnedMessageUpdated {
                 targets: if group.ty.is_public() {
-                    cache.users.iter().map(|(uid, _)| *uid).collect()
+                    cache.users.keys().copied().collect()
                 } else {
                     group.members.clone()
                 },

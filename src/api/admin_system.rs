@@ -261,7 +261,7 @@ impl ApiAdminSystem {
 
         let key_config_path = state.config.system.data_dir.join("key.json");
         std::fs::write(
-            &key_config_path,
+            key_config_path,
             serde_json::to_vec(&*key_config).map_err(InternalServerError)?,
         )
         .map_err(InternalServerError)?;
