@@ -329,7 +329,7 @@ impl State {
                 read_index_group: Default::default(),
                 status: UserStatus::Normal,
                 is_guest,
-                webhook_url: None,
+                webhook_url: create_user.webhook_url.map(ToString::to_string),
                 is_bot: create_user.is_bot,
                 bot_keys: Default::default(),
             },
