@@ -12,7 +12,7 @@ Digital technologies including Internet and the Web make information duplicable 
 
 # Why Personal Cloud
 
-We need a "home" as our private property as netizens on the internet, and this home should have features more than just storage. No matter you choose NAS, AWS, Raspberry Pi or your local PC to run VoceChat, it is your own private property--yes, public cloud services like AWS purchased by you is commercially your own property and the data in your cloud is protected from accessing by the public cloud service providers. Features including but not limited to instant messaging, activity posts, private video calls, notes, whiteboard are all desiring and useful on your personal cloud home. Personal cloud is the new PC, and there will be a new software layer with some shared traits--web accessible (web app), good API, interoperable profiles. Privoce is working on this software layer.
+We need a "home" as our private property on the Internet, and this home should have features more than just storage. No matter you choose NAS, AWS, Raspberry Pi or your local PC to run VoceChat, it is your own private property--yes, public cloud services like AWS purchased by you is commercially your own property and the data in your cloud is protected from accessing by the public cloud service providers. Features including but not limited to instant messaging, activity posts, private video calls, notes, whiteboard are all desiring and useful on your personal cloud server. Personal cloud is the new PC, and there will be a new software layer with some shared traits--distributed by URL(web app), good API, interoperable profiles. Privoce is currently working on this software layer of personal cloud.
 
 # Why Rust
 
