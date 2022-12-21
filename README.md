@@ -38,9 +38,10 @@ Therefore, Vocechat is created and positioned as a social collaboration program 
 
 The team is internationalized and cooperates remotely.
 The contributors come from North America, South America, Asia and Africa.
-Vocechat is an open-source product with a free community version and only charges for business usages. You are welcome to star, raise issues, and contribute in any form.
 
-We plan to charge a license fee for commercial usages and we also provide resale license personalization services for NAS and cloud providers who want to collaborate with us (just like SynologyChat for their NAS). We also provide a free version for personal usages (servers with less than 20 members). 
+VoceChat is an open-source product with a free community version and only charges for business usages. You are welcome to star, raise issues, and contribute in any form.
+
+We charge a license fee for commercial usages and we also provide resale license personalization services for NAS and cloud providers who want to collaborate with us (just like SynologyChat for their NAS). We also provide a free version for personal usages (servers with less than 20 members). 
 
 ### Project composition:
 
@@ -76,10 +77,13 @@ docker run -d --restart=always \
   Privoce/vocechat-server:latest
 ```
 
-Open browser and visit: http://localhost:3009/
+On browser visit: http://localhost:3009/
+
 
 ### Contact Us
 
 Doc: [https://doc.voce.chat](https://doc.voce.chat)  
 Chat with us: [https://voce.chat](https://voce.chat)  
 Email: [han@privoce.com](han@privoce.com)
+### Welcome your help of any form--code, issues, blog articles, social media shares.
+
