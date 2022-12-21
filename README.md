@@ -16,7 +16,7 @@ We need a "home" as our private property on the Internet, and this home should h
 
 # Why Rust
 
-This Rust written server is only 15MB and runs with great efficiency, which means hosting a private social media server can become an individual thing, no matter where it is hosted--on your public cloud server, personal NAS or Raspberry Pi, etc. Just like cars v. public transportation, or single family home v. hotels, private social media is more personalized and all data is owned by the owner, so that there could be a new paradigm of private social media along with today's central social media platforms--if Facebook is a hotel, then Voce is like a house. However, private social media is not free--just like lands and houses are not free--you pay for the server fee to avoid censorship and surveillance capitalism.
+Personal cloud needs efficent solutions. This Rust written server is only 15MB and runs with great efficiency. Hosting a 15MB private social media server is much more accessible than a 300MB one. Just like cars v. bus, or single family home v. hotels, if Facebook is a hotel, then VoceChat is like a house. If Matrix and Mastodon are buses, then VoceChat is a car.
 
 # How to get interconnected (work in progress)
 
@@ -39,6 +39,8 @@ Therefore, Vocechat is created and positioned as a social collaboration program 
 The team is internationalized and cooperates remotely.
 The contributors come from North America, South America, Asia and Africa.
 Vocechat is an open-source product with a free community version and only charges for business usages. You are welcome to star, raise issues, and contribute in any form.
+
+We plan to charge a license fee for commercial usages and we also provide resale license personalization services for NAS and cloud providers who want to collaborate with us (just like SynologyChat for their NAS). We also provide a free version for personal usages (servers with less than 20 members). 
 
 ### Project composition:
 
