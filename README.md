@@ -46,7 +46,7 @@ We plan to charge a license fee for commercial usages and we also provide resale
 
 | Name       | Tech                                | Project                                                   | License | Comment                                             |
 | ---------- | ----------------------------------- | --------------------------------------------------------- | ------- | --------------------------------------------------- |
-| Server     | Rust                                | [vocechat-server](https://github.com/privoce/voce-server) | CC-NC   | Server Supports platforms: Linux, Windows, Arm32/64 |
+| Server     | Rust                                | [vocechat-server](https://github.com/privoce/voce-server) | Creative Commons Attribution-NonCommercial 4.0 International   | Server Supports platforms: Linux, Windows, Arm32/64 |
 | APP Client | Flutter                             | [vocechat-client](https://github.com/privoce/voce-client) | GPLv3     | Client supports Android and IOS platforms           |
 | Web Client | React                               | [vocechat-web](https://github.com/privoce/vocechat-web)   | GPLv3     | Web App, integrated management                      |
 | Document   | [docusaurus](https://docusaurus.io) | [vocechat-doc](https://github.com/privoce/vocechat-doc)   | GPLv3     | Vocechat document website                           |
