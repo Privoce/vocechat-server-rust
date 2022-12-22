@@ -1385,6 +1385,7 @@ pub(crate) async fn forward_chat_messages_to_webhook(state: State) {
                     for _ in 0..3 {
                         if client
                             .post(&webhook_url)
+                            .header("content-type", "application/json")
                             .body(msg_json.clone())
                             .send()
                             .await
