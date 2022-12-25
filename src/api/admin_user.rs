@@ -45,6 +45,7 @@ pub struct CreateUserRequest {
     #[oai(default)]
     pub language: LangId,
     pub webhook_url: Option<String>,
+    #[oai(default)]
     pub is_bot: bool,
 }
 
@@ -146,8 +147,8 @@ impl ApiAdminUser {
     async fn create(
         &self,
         state: Data<&State>,
-        token: Token,
         mut req: Json<CreateUserRequest>,
+        token: Token,
     ) -> Result<CreateUserResponse> {
         if !token.is_admin {
             return Err(Error::from_status(StatusCode::FORBIDDEN));
@@ -640,7 +641,6 @@ mod tests {
 
         let admin_token = server.login_admin().await;
         let uid = server.create_user(&admin_token, "test1@voce.chat").await;
-
         let token = server.login("test1@voce.chat").await;
         let current_user = server.parse_token(token).await;
         assert_eq!(uid, current_user.uid);

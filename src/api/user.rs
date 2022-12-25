@@ -2147,6 +2147,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": true,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                     "create_by": "password",
                 }),
@@ -2157,6 +2158,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": false,
+                    "is_bot": false,
                     "create_by": "password",
                     "avatar_updated_at": 0,
                 }),
@@ -2184,6 +2186,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": true,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                     "create_by": "password",
                 }),
@@ -2194,6 +2197,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": false,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                     "create_by": "password",
                 }),
@@ -2204,6 +2208,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": false,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                     "create_by": "password",
                 }),
@@ -2224,6 +2229,7 @@ mod tests {
                 "gender": 1,
                 "language": "en-US",
                 "is_admin": false,
+                "is_bot": false,
                 "avatar_updated_at": 0,
             })]
         );
@@ -2253,6 +2259,7 @@ mod tests {
                     "gender": null,
                     "language": null,
                     "is_admin": null,
+                    "is_bot": null,
                     "avatar_updated_at": null,
                 })]
             );
@@ -2279,6 +2286,7 @@ mod tests {
                 "gender": null,
                 "language": null,
                 "is_admin": null,
+                "is_bot": null,
                 "avatar_updated_at": null,
             })]
         );
@@ -2304,6 +2312,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": true,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                     "create_by": "password",
                 }),
@@ -2314,6 +2323,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": false,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                     "create_by": "password",
                 }),
@@ -2324,6 +2334,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": false,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                     "create_by": "password",
                 }),
@@ -2343,6 +2354,7 @@ mod tests {
                 "gender": 1,
                 "language": "en-US",
                 "is_admin": false,
+                "is_bot": false,
                 "avatar_updated_at": 0,
             })]
         );
@@ -2380,6 +2392,7 @@ mod tests {
                     "gender": null,
                     "language": null,
                     "is_admin": null,
+                    "is_bot": null,
                     "avatar_updated_at": null,
                 }),
                 json!({
@@ -2391,6 +2404,7 @@ mod tests {
                     "gender": null,
                     "language": null,
                     "is_admin": null,
+                    "is_bot": null,
                     "avatar_updated_at": null,
                 }),
                 json!({
@@ -2402,6 +2416,7 @@ mod tests {
                     "gender": 1,
                     "language": "en-US",
                     "is_admin": false,
+                    "is_bot": false,
                     "avatar_updated_at": 0,
                 }),
                 json!({
@@ -2413,6 +2428,7 @@ mod tests {
                     "gender": null,
                     "language": null,
                     "is_admin": null,
+                    "is_bot": null,
                     "avatar_updated_at": avatar_updated_at,
                 }),
             ]
@@ -3857,7 +3873,7 @@ mod tests {
         let json = resp.json().await;
         let new_magic_token = json.value().object().get("new_magic_token").string();
         // let new_magic_token = resp.0.into_body().into_string().await.unwrap();
-        // dbg!(&new_magic_token);
+        dbg!(&new_magic_token);
 
         let resp = server
             .post("/api/user/register")
