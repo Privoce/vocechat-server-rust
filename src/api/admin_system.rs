@@ -1,7 +1,6 @@
 use image::ImageFormat;
 use poem::{error::InternalServerError, http::StatusCode, web::Data, Error, Result};
 use poem_openapi::{
-    param::Query,
     payload::{Binary, Json, PlainText},
     types::Email,
     ApiRequest, Object, OpenApi,
@@ -269,13 +268,33 @@ impl ApiAdminSystem {
         Ok(PlainText(new_third_party_secret))
     }
 
-    /// Update third-party secret
+    /// Get the frontend url
+    #[oai(path = "/frontend_url", method = "get")]
+    async fn get_frontend_url(
+        &self,
+        state: Data<&State>,
+        token: Token,
+    ) -> Result<PlainText<String>> {
+        if !token.is_admin {
+            return Err(Error::from_status(StatusCode::FORBIDDEN));
+        }
+
+        Ok(PlainText(
+            state
+                .get_dynamic_config_instance::<FrontendUrlConfig>()
+                .await
+                .and_then(|config| config.url.clone())
+                .unwrap_or_default(),
+        ))
+    }
+
+    /// Update the frontend url
     #[oai(path = "/update_frontend_url", method = "post")]
     async fn update_frontend_url(
         &self,
         state: Data<&State>,
         token: Token,
-        frontend_url: Query<String>,
+        frontend_url: PlainText<String>,
     ) -> Result<()> {
         if !token.is_admin {
             return Err(Error::from_status(StatusCode::FORBIDDEN));
