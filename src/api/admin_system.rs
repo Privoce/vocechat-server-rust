@@ -389,7 +389,8 @@ mod tests {
         let resp = server
             .post("/api/admin/system/update_frontend_url")
             .header("X-API-Key", &admin_token)
-            .query("frontend_url", &"http://1.2.3.4:4000")
+            .content_type("text/plain")
+            .body("http://1.2.3.4:4000")
             .send()
             .await;
         resp.assert_status_is_ok();

@@ -804,12 +804,12 @@ impl ApiToken {
                 let token = github_fetch_token(&code, &state)
                     .await
                     .map_err(|err| poem::Error::from((StatusCode::BAD_REQUEST, err)))?;
-                let (username, avatar_url) = github_fetch_user_info(&token)
+                let github_userinfo = github_fetch_user_info(&token)
                     .await
                     .map_err(|err| poem::Error::from((StatusCode::BAD_REQUEST, err)))?;
                 let sql = "select uid from github_auth where username = ?";
                 match sqlx::query_as::<_, (i64,)>(sql)
-                    .bind(&username)
+                    .bind(&github_userinfo.username)
                     .fetch_optional(&state.db_pool)
                     .await
                     .map_err(InternalServerError)?
@@ -827,12 +827,12 @@ impl ApiToken {
                             .await
                             .users
                             .iter()
-                            .find(|(_, user)| user.name.as_str() == username.as_str())
+                            .find(|(_, user)| user.email.as_ref() == github_userinfo.email.as_ref())
                             .map(|(uid, _)| *uid);
                         if let Some(uid) = uid {
                             let sql = "insert into github_auth (username, uid) values (?, ?)";
                             sqlx::query(sql)
-                                .bind(&username)
+                                .bind(&github_userinfo.username)
                                 .bind(uid)
                                 .execute(&state.db_pool)
                                 .await
@@ -840,18 +840,21 @@ impl ApiToken {
                             uid
                         } else {
                             // download avatar
-                            let avatar = download_avatar(&avatar_url).await.ok();
+                            let avatar = match &github_userinfo.avatar_url {
+                                Some(avatar_url) => download_avatar(avatar_url).await.ok(),
+                                None => None,
+                            };
 
                             let name = state
                                 .cache
                                 .write()
                                 .await
-                                .assign_username(Some(&username), None);
+                                .assign_username(Some(&github_userinfo.username), None);
 
                             let mut create_user = CreateUser::new(
                                 &name,
                                 CreateUserBy::Github {
-                                    username: username.as_str(),
+                                    username: github_userinfo.username.as_str(),
                                 },
                                 false,
                             );
@@ -1099,7 +1102,7 @@ impl ApiToken {
                 }
                 let github_token = github_fetch_token(&code.code, &state).await?;
                 match github_fetch_user_info(&github_token).await {
-                    Ok((username, _avatar_url)) => {
+                    Ok(GithubUserInfo { username, .. }) => {
                         let sql = "insert into github_auth (username, uid) values (?, ?)";
                         sqlx::query(sql)
                             .bind(username)
@@ -1556,7 +1559,14 @@ async fn github_fetch_token(code: &str, state: &State) -> anyhow::Result<String>
 // "private_repos": 10000
 // }
 // }
-async fn github_fetch_user_info(token: &str) -> anyhow::Result<(String, String)> {
+
+struct GithubUserInfo {
+    username: String,
+    email: Option<String>,
+    avatar_url: Option<String>,
+}
+
+async fn github_fetch_user_info(token: &str) -> anyhow::Result<GithubUserInfo> {
     let client = reqwest::Client::new();
     let res = client
         .get("https://api.github.com/user")
@@ -1571,19 +1581,21 @@ async fn github_fetch_user_info(token: &str) -> anyhow::Result<(String, String)>
     let username = pairs
         .get("login")
         .and_then(|v| v.as_str())
-        .unwrap_or_default()
+        .unwrap()
         .to_string();
+    let email = pairs
+        .get("email")
+        .and_then(|v| v.as_str())
+        .map(ToString::to_string);
     let avatar_url = pairs
         .get("avatar_url")
         .and_then(|v| v.as_str())
-        .unwrap_or_default()
-        .to_string();
-    // let pairs = serde_urlencoded::from_str::<Vec(String, String)>(&body)?;
-    // let username = pairs.get("login").cloned().ok_or(anyhow::anyhow!("expect
-    // username"))?; let avatar_url =
-    // pairs.get("avatar_url").cloned().ok_or(anyhow::anyhow!("expect
-    // avatar_url"))?;
-    Ok((username, avatar_url))
+        .map(ToString::to_string);
+    Ok(GithubUserInfo {
+        username,
+        email,
+        avatar_url,
+    })
 }
 
 async fn oidc_get_id_token(

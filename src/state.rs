@@ -1429,7 +1429,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // mute uid1 and token1
         let resp = server

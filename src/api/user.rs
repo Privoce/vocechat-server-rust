@@ -2575,7 +2575,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         for events in [&mut events_admin, &mut events1, &mut events2] {
             let msg = events.next().await.unwrap();
@@ -2616,7 +2616,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         for events in [&mut events_admin, &mut events1, &mut events2] {
             let msg = events.next().await.unwrap();
@@ -2654,7 +2654,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // delete group by owner
         let resp = server
@@ -2705,7 +2705,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // delete group by admin
         let resp = server
@@ -2752,7 +2752,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // add uid1, uid2
         let resp = server
@@ -2795,7 +2795,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // remove uid2 from group
         let resp = server
@@ -2836,7 +2836,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // delete user1
         let resp = server
@@ -2885,7 +2885,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // add uid2
         let resp = server
@@ -2937,7 +2937,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // create user2
         let uid2 = server.create_user(&admin_token, "user2@voce.chat").await;
@@ -2980,7 +2980,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // remove uid2
         let resp = server
@@ -3029,7 +3029,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // delete user2
         let resp = server
@@ -3065,7 +3065,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid1 = json.value().i64();
+        let gid1 = json.value().object().get("gid").i64();
 
         // create private group
         let resp = server
@@ -3079,7 +3079,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid2 = json.value().i64();
+        let gid2 = json.value().object().get("gid").i64();
 
         let mut events1 = server
             .subscribe_events(&token1, Some(&["related_groups"]))
@@ -3122,7 +3122,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // user2 leave the group
         let resp = server
@@ -3156,7 +3156,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // mute uid1 and gid
         let resp = server
@@ -3216,7 +3216,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // mute uid1
         let resp = server
@@ -3309,7 +3309,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // mute uid1 and gid
         let resp = server
@@ -3500,7 +3500,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         let mut events_admin_ios = server
             .subscribe_events(
@@ -3659,7 +3659,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         let mut events_admin_ios = server
             .subscribe_events(

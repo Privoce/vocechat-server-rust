@@ -814,7 +814,7 @@ mod tests {
                 .send()
                 .await;
             resp.assert_status_is_ok();
-            gid_list.push(resp.json().await.value().i64());
+            gid_list.push(resp.json().await.value().object().get("gid").i64());
         }
 
         server

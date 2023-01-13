@@ -1158,7 +1158,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
         let json = server.get_group(gid).await;
         let group = json.value().object();
         group.get("gid").assert_i64(gid);
@@ -1336,7 +1336,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // update group with normal user
         let resp = server
@@ -1379,7 +1379,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // change the owner
         let resp = server
@@ -1412,7 +1412,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // delete group with normal user
         let resp = server
@@ -1458,7 +1458,7 @@ mod tests {
             .send()
             .await;
         resp.assert_status_is_ok();
-        let gid = resp.json().await.value().i64();
+        let gid = resp.json().await.value().object().get("gid").i64();
 
         // send text
         for i in 0..10 {
@@ -1523,7 +1523,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         // subscribe events
         let mut events1 = server.subscribe_events(&token1, Some(&["chat"])).await;
@@ -1568,7 +1568,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let public_gid = json.value().i64();
+        let public_gid = json.value().object().get("gid").i64();
 
         // create group1
         let resp = server
@@ -1582,7 +1582,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid1 = json.value().i64();
+        let gid1 = json.value().object().get("gid").i64();
 
         // create group2
         let resp = server
@@ -1596,7 +1596,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid2 = json.value().i64();
+        let gid2 = json.value().object().get("gid").i64();
 
         // get related groups
         async fn check_groups(server: &TestServer, token: &str, mut groups: Vec<i64>) {
@@ -1641,7 +1641,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         let id1 = server.send_text_to_group(&admin_token, gid, "a").await;
         let id2 = server.send_text_to_group(&admin_token, gid, "b").await;
@@ -1714,7 +1714,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         assert_eq!(
             server
@@ -1786,7 +1786,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let public_gid = json.value().i64();
+        let public_gid = json.value().object().get("gid").i64();
 
         let resp = server
             .post("/api/group")
@@ -1800,7 +1800,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let private_gid = json.value().i64();
+        let private_gid = json.value().object().get("gid").i64();
 
         // update public group
         let resp = server
@@ -1891,7 +1891,7 @@ mod tests {
     //         .await;
     //     resp.assert_status_is_ok();
     //     let json = resp.json().await;
-    //     let gid = json.value().i64();
+    //     let gid = json.value().object().get("gid").i64();
     //
     //     // create invite link
     //     let resp = server
@@ -1981,7 +1981,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         let mid1 = server.send_text_to_group(&admin_token, gid, "a").await;
         let mid2 = server.send_text_to_group(&admin_token, gid, "b").await;
@@ -2077,7 +2077,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         let mid1 = server.send_text_to_group(&admin_token, gid, "a").await;
         let mid2 = server.send_text_to_group(&admin_token, gid, "b").await;
@@ -2171,7 +2171,7 @@ mod tests {
             .await;
         resp.assert_status_is_ok();
         let json = resp.json().await;
-        let gid = json.value().i64();
+        let gid = json.value().object().get("gid").i64();
 
         let mid1 = server.send_text_to_group(&admin_token, gid, "a").await;
         let mid2 = server.send_text_to_group(&admin_token, gid, "b").await;

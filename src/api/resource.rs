@@ -816,7 +816,7 @@ mod tests {
                 .send()
                 .await;
             if resp.0.status() != StatusCode::RANGE_NOT_SATISFIABLE {
-                assert_eq!(resp.0.status(), StatusCode::OK);
+                assert_eq!(resp.0.status(), StatusCode::PARTIAL_CONTENT);
             } else {
                 break;
             }
@@ -973,7 +973,7 @@ mod tests {
             .send()
             .await;
         resp.assert_status_is_ok();
-        let gid = resp.json().await.value().i64();
+        let gid = resp.json().await.value().object().get("gid").i64();
 
         let mid1 = server.send_text_to_group(&admin_token, gid, "abc").await;
         let mid2 = server.send_text_to_group(&admin_token, gid, "def").await;
