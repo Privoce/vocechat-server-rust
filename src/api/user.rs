@@ -45,7 +45,7 @@ use crate::{
     },
     create_user::{CreateUser, CreateUserBy, CreateUserError},
     middleware::guest_forbidden,
-    state::{BroadcastEvent, Cache, CacheUser, UserEvent},
+    state::{BroadcastEvent, Cache, CacheDevice, CacheUser, UserEvent},
     SqlitePool, State,
 };
 
@@ -1468,6 +1468,50 @@ impl ApiUser {
     #[oai(path = "/delete", method = "delete")]
     async fn delete_current_user(&self, state: Data<&State>, token: Token) -> Result<()> {
         state.delete_user(token.uid).await?;
+        Ok(())
+    }
+
+    /// Register a new user with the magic token
+    #[oai(path = "/update_fcm_token", method = "put")]
+    async fn update_fcm_token(
+        &self,
+        state: Data<&State>,
+        token: Token,
+        device: Query<String>,
+        fcm_token: PlainText<String>,
+    ) -> Result<()> {
+        let mut cache = state.cache.write().await;
+        let uid = token.uid;
+        let cached_user = match cache.users.get_mut(&uid) {
+            Some(cached_user) => cached_user,
+            None => return Err(Error::from_status(StatusCode::UNAUTHORIZED)),
+        };
+
+        // update device token
+        sqlx::query(
+            r#"
+        insert into device (uid, device, device_token) values (?, ?, ?)
+            on conflict (uid, device) do update set device_token = excluded.device_token
+        "#,
+        )
+        .bind(uid)
+        .bind(&device.0)
+        .bind(&fcm_token.0)
+        .execute(&state.db_pool)
+        .await
+        .map_err(InternalServerError)?;
+
+        cached_user
+            .devices
+            .entry(device.to_string())
+            .and_modify(|device| {
+                device.device_token = Some(fcm_token.0.clone());
+            })
+            .or_insert_with(|| CacheDevice {
+                device_token: Some(fcm_token.0),
+                sender: None,
+            });
+
         Ok(())
     }
 }
