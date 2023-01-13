@@ -15,7 +15,7 @@ reqwest = { version = "0.11.10", features = [
 serde = "1.0.136"
 serde_derive = "1.0.136"
 serde_json = "1.0.79"
-poem-openapi = { version = "2.0.0-alpha.4", optional = true }
+poem-openapi = { version = "2.0.23", optional = true }
 http = "0.2.6"
 url = "2.2.2"
 flate2 = "1.0"

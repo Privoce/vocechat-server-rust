@@ -7,13 +7,12 @@ use mime_guess::{mime, Mime};
 use poem::{
     error::{BadRequest, InternalServerError},
     http::{header, HeaderMap, StatusCode},
-    web::{Data, StaticFileRequest},
+    web::{Data, StaticFileRequest, StaticFileResponse},
     Body, Error, Result,
 };
 use poem_openapi::{
     param::Query,
     payload::{Binary, Json, Response},
-    response::StaticFileResponse,
     ApiRequest, Multipart, Object, OpenApi,
 };
 use serde::{Deserialize, Serialize};
@@ -39,20 +38,20 @@ pub enum UploadImageRequest {
 
 /// Prepare upload file request
 #[derive(Debug, Object)]
-struct PrepareUploadFileRequest {
-    content_type: Option<String>,
-    filename: Option<String>,
+pub struct PrepareUploadFileRequest {
+    pub content_type: Option<String>,
+    pub filename: Option<String>,
 }
 
 /// Upload file request
 #[derive(Debug, Multipart)]
-struct UploadFileRequest {
+pub struct UploadFileRequest {
     #[oai(default)]
     /// file_id: uuid that return by prepare uploading file API
-    file_id: String,
-    chunk_data: poem_openapi::types::Binary<Vec<u8>>,
+    pub file_id: String,
+    pub chunk_data: poem_openapi::types::Binary<Vec<u8>>,
     #[oai(default)]
-    chunk_is_last: bool,
+    pub chunk_is_last: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -74,18 +73,18 @@ struct DownloadFileRequest {
 
 /// Image properties
 #[derive(Debug, Object)]
-struct ImageProperties {
-    width: u32,
-    height: u32,
+pub struct ImageProperties {
+    pub width: u32,
+    pub height: u32,
 }
 
 /// Download file request
 #[derive(Debug, Object)]
-struct UploadFileResponse {
-    path: String,
-    size: i64,
-    hash: String,
-    image_properties: Option<ImageProperties>,
+pub struct UploadFileResponse {
+    pub path: String,
+    pub size: i64,
+    pub hash: String,
+    pub image_properties: Option<ImageProperties>,
 }
 
 #[derive(Debug, Object)]
@@ -106,18 +105,11 @@ impl ApiResource {
     ) -> Result<StaticFileResponse> {
         let path = state.config.system.data_dir.join("organization.png");
         if path.exists() {
-            Ok(req.create_response(path, false).into())
+            Ok(req.create_response(path, false)?)
         } else {
-            Ok(StaticFileResponse::Ok(
-                Binary(
-                    include_bytes!("assets/organization-logo.png")
-                        .to_vec()
-                        .into(),
-                ),
-                None,
-                None,
-                Some("image/png".to_string()),
-            ))
+            Ok(req
+                .create_response_from_data(include_bytes!("assets/organization-logo.png"))?
+                .with_content_type("image/png"))
         }
     }
 
@@ -134,7 +126,7 @@ impl ApiResource {
             .system
             .avatar_dir()
             .join(format!("{}.png", uid.0));
-        Ok(req.create_response(path, false).into())
+        Ok(req.create_response(path, false)?)
     }
 
     /// Get user avatar by id
@@ -150,7 +142,7 @@ impl ApiResource {
             .system
             .group_avatar_dir()
             .join(format!("{}.png", gid.0));
-        Ok(req.create_response(path, false).into())
+        Ok(req.create_response(path, false)?)
     }
 
     /// Prepare for uploading file
@@ -375,7 +367,7 @@ impl ApiResource {
                 filename: None,
             });
 
-        let mut resp = Response::new(req.create_response(path, false).into());
+        let mut resp = Response::new(req.create_response(path, false)?);
         let ty = if download.0 { "attachment" } else { "inline" };
         resp = resp.header(header::CONTENT_TYPE, meta.content_type);
         if let Some(filename) = meta.filename {
@@ -495,7 +487,7 @@ impl ApiResource {
     }
 }
 
-async fn sha256_file<P: AsRef<std::path::Path>>(path: P) -> anyhow::Result<String> {
+pub async fn sha256_file<P: AsRef<std::path::Path>>(path: P) -> anyhow::Result<String> {
     let path = path.as_ref().to_path_buf();
     Ok(tokio::task::spawn_blocking(move || {
         let mut file = std::fs::File::open(path)?;

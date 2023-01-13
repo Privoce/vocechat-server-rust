@@ -13,11 +13,7 @@ vc-license = { path = "./crates/vc-license" }
 agora-token = { path = "./crates/agora-token" }
 open-graph = { path = "./crates/open-graph", features = ["poem_openapi"] }
 
-anyhow = "1.0.51"
-chrono = { version = "0.4.19", features = ["serde"] }
-fnv = "1.0.7"
-hex = "0.4.3"
-poem = { version = "1.3.50", features = [
+poem = { version = "1.3.51", features = [
     "rustls",
     "sse",
     "static-files",
@@ -27,7 +23,7 @@ poem = { version = "1.3.50", features = [
     "acme",
     'tokio-metrics',
 ] }
-poem-openapi = { version = "2.0.21", features = [
+poem-openapi = { version = "2.0.23", features = [
     "rapidoc",
     "swagger-ui",
     "redoc",
@@ -95,6 +91,9 @@ zip = { version = "0.6.0", default-features = false, features = ["deflate"] }
 mime_guess = "2.0.4"
 url = "1.7.2"
 once_cell = "1.13.0"
+chrono = { version = "0.4.19", features = ["serde"] }
+anyhow = "1.0.51"
+hex = "0.4.3"
 
 [target.'cfg(not(windows))'.dependencies]
 daemonize = "0.4.1"
@@ -113,3 +112,4 @@ reqwest = { version = "0.11.8", default-features = false, features = [
     "rustls-tls",
 ] }
 tempfile = "3.2.0"
+fnv = "1.0.7"

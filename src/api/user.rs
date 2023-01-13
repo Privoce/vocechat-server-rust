@@ -659,7 +659,7 @@ impl ApiUser {
         let user = cache
             .users
             .get(&uid.0)
-            .ok_or_else(|| Error::from_status(StatusCode::UNAUTHORIZED))?;
+            .ok_or_else(|| Error::from_status(StatusCode::NOT_FOUND))?;
         Ok(Json(user.api_user_info(uid.0)))
     }
 
