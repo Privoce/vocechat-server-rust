@@ -114,6 +114,13 @@ struct UnpinMessageRequest {
     mid: i64,
 }
 
+/// Create group response
+#[derive(Debug, Object)]
+struct CreateGroupResponse {
+    gid: i64,
+    created_at: DateTime,
+}
+
 pub struct ApiGroup;
 
 #[OpenApi(prefix_path = "/group", tag = "ApiTags::Group")]
@@ -125,7 +132,7 @@ impl ApiGroup {
         state: Data<&State>,
         req: Json<Group>,
         token: Token,
-    ) -> Result<Json<i64>> {
+    ) -> Result<Json<CreateGroupResponse>> {
         let mut cache = state.cache.write().await;
 
         if req.is_public && !token.is_admin {
@@ -227,7 +234,10 @@ impl ApiGroup {
                 group,
             }));
 
-        Ok(Json(gid))
+        Ok(Json(CreateGroupResponse {
+            gid,
+            created_at: now,
+        }))
     }
 
     /// Upload group avatar
