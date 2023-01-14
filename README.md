@@ -1,6 +1,6 @@
 
 # Re-decentralized the Internet through personal cloud computing.
-## VoceChat is a ```15 MB``` chat server prioritizes private hosting!
+## VoceChat is a `15 MB` chat server prioritizes private hosting!
 
 # Grand Goal
 
