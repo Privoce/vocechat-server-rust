@@ -29,8 +29,9 @@ use walkdir::WalkDir;
 use crate::{
     api::{
         get_merged_message, ChatMessage, DateTime, FrontendUrlConfig, Group, GroupChangedMessage,
-        KickFromGroupReason, KickReason, LangId, PinnedMessage, SmtpConfig, UpdateAction, User,
-        UserDevice, UserInfo, UserSettingsChangedMessage, UserStateChangedMessage, UserUpdateLog,
+        KickFromGroupReason, KickReason, LangId, MessageDetail, PinnedMessage, SmtpConfig,
+        UpdateAction, User, UserDevice, UserInfo, UserSettingsChangedMessage,
+        UserStateChangedMessage, UserUpdateLog,
     },
     config::KeyConfig,
     Config,
@@ -1361,6 +1362,13 @@ pub(crate) async fn forward_chat_messages_to_webhook(state: State) {
 
     while let Ok(event) = rx.recv().await {
         if let BroadcastEvent::Chat { targets, message } = &*event {
+            if !matches!(
+                &message.payload.detail,
+                MessageDetail::Normal(_) | MessageDetail::Reply(_)
+            ) {
+                continue;
+            }
+
             let webhook_urls = state
                 .cache
                 .read()
