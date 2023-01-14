@@ -47,6 +47,8 @@ struct UpdateGroupRequest {
 #[derive(Debug, Object)]
 struct ChangeGroupTypeRequest {
     is_public: bool,
+    #[oai(default)]
+    members: Vec<i64>,
 }
 
 impl UpdateGroupRequest {
@@ -512,12 +514,17 @@ impl ApiGroup {
                     .execute(&mut tx)
                     .await
                     .map_err(InternalServerError)?;
+                let members = if !req.members.is_empty() {
+                    req.members.clone()
+                } else {
+                    users
+                        .iter()
+                        .filter(|(_, user)| !user.is_guest)
+                        .map(|(id, _)| *id)
+                        .collect()
+                };
 
-                for uid in users
-                    .iter()
-                    .filter(|(_, user)| !user.is_guest)
-                    .map(|(id, _)| *id)
-                {
+                for uid in members {
                     sqlx::query("insert into group_user (gid, uid) values (?, ?)")
                         .bind(gid.0)
                         .bind(uid)
@@ -551,11 +558,15 @@ impl ApiGroup {
         match (group.ty.is_public(), req.is_public) {
             (true, false) => {
                 group.ty = GroupType::Private { owner: token.uid };
-                group.members = users
-                    .iter()
-                    .filter(|(_, user)| !user.is_guest)
-                    .map(|(id, _)| *id)
-                    .collect();
+                group.members = if !req.members.is_empty() {
+                    req.members.iter().copied().collect()
+                } else {
+                    users
+                        .iter()
+                        .filter(|(_, user)| !user.is_guest)
+                        .map(|(id, _)| *id)
+                        .collect()
+                };
 
                 let _ = state
                     .event_sender
