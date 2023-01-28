@@ -1,6 +1,6 @@
 
 # Re-decentralized the Internet through personal cloud computing.
-## VoceChat is a `15 MB` chat server prioritizes private hosting!
+## VoceChat is the `lightest` chat server prioritizes private hosting!
 
 # Grand Goal
 
@@ -16,7 +16,7 @@ We need a "home" as our private property on the Internet, and this home should h
 
 # Why Rust
 
-Personal cloud needs efficent solutions. This Rust written server is only 15MB and runs with great efficiency. Hosting a 15MB private social media server is much more accessible than a 300MB one. Just like cars v. bus, or single family home v. hotels, if Facebook is a hotel, then VoceChat is like a house. If Matrix and Mastodon are buses, then VoceChat is a car.
+Personal cloud needs efficent solutions. This Rust written server is less than 20MB and runs with great efficiency. Hosting a 10+MB private social media server is much more accessible than a 300MB one. Just like cars v. bus, or single family home v. hotels, if Facebook is a hotel, then VoceChat is like a house. If Matrix and Mastodon are buses, then VoceChat is a car.
 
 # How to get interconnected (work in progress)
 
