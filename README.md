@@ -1,7 +1,7 @@
 
 # Re-decentralized the Internet through personal cloud computing.
 ## VoceChat is the `lightest` chat server prioritizes private hosting!
-### Quickly run
+### Quick run
 
 ```bash
 docker run -d --restart=always \
