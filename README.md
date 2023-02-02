@@ -2,9 +2,9 @@
 # Re-decentralized the Internet through personal cloud computing.
 ## VoceChat is the `lightest` chat server prioritizes private hosting!
 
-# Grand Goal
+# Goal
 
-The grand goal of Voce is to provide a space owned by "you" on the Internet, just as the name "voce" means in portguese. As cloud computing is getting matured, there will be a time in the foreseeable future that netizens like you and me can enjoy the benefit of having a personal cloud space on the Internet.
+The goal of Voce is to provide a space owned by "you" on the Internet, just as the name "voce" means in portguese. As cloud computing getting matured, there will be a time in the foreseeable future that netizens like you and me can enjoy the benefit of having a personal cloud space on the Internet--like iCloud, while not only will you have storage, but also a personalized computing layer.
 
 Why do we need a private cloud space? The short answer is that information will become our private property and means of communication will be under the control of every netizen.
 
@@ -16,32 +16,23 @@ We need a "home" as our private property on the Internet, and this home should h
 
 # Why Rust
 
-Personal cloud needs efficent solutions. This Rust written server is less than 20MB and runs with great efficiency. Hosting a 10+MB private social media server is much more accessible than a 300MB one. Just like cars v. bus, or single family home v. hotels, if Facebook is a hotel, then VoceChat is like a house. If Matrix and Mastodon are buses, then VoceChat is a car.
+Personal cloud needs efficent solutions. This Rust written server is less than 20MB and runs with great efficiency. Hosting a 20MB private social media server is much more accessible than a 300MB one. Just like cars v. bus, or single family home v. hotels, if Facebook is a grand hotel, VoceChat is like a house. If Matrix and Mastodon are buses, VoceChat is like a car. The next paradigm of the internet is serverless functions + personal storage. Making VoceChat serverless is also a next step.
 
 # How to get interconnected (work in progress)
 
-Social media cannot always stay private if people want new information to be transferred among different servers. The word "social" in social media means multiple nodes communicate with multiple nodes in a synced space (mass to mass). A channel (private or public) should serve the end of this mass to mass data sharing and syncing space. Each channel should function like a "shared ledger" where members who joined should have the right to use their server to distributely store the same chat data--this functions like Bitcoin, yet in the chat channel scenario, efficiency should be more prioritiezed and trust does not necessarily come evenly from every node (admin of the channel could have the right to assign "power" to members)--compared with blockchain, git is a more proper example. We have supported both inbound and outbound webhooks so that it's possible to sync messages from a VoceChat channel to another channel (slack, discord, or VoceChat) though you will need to write your own code to personalize this process. Matrix.org has provided a standard exactly solving this multi-server data storage needs. Hence a support for matrix is desirable in the next steps.
+Social media cannot always stay private if people want new information to be transferred among different servers. The word "social" in social media means multiple nodes communicate with multiple nodes in a synced space (mass to mass). A channel (private or public) should serve the end of this mass to mass data sharing and syncing space. Channel should function as a shared good where members who joined should have the right to store the same chat data (use their server)--this may one day functions like Bitcoin, yet currently, efficiency should be more prioritiezed and admin of the channel could have the right to assign different "power" to members. We have implemented both inbound and outbound webhooks so that it's possible to sync messages from a VoceChat channel to another channel (slack, discord, or VoceChat) though you will need to write your own server side code to personalize this process (this could be troublesome, and again, serverless could be a good solution). 
 
-Or if you have a proposal on how multiple servers could get interconnected, feel free to share and discuss it with us here or through our chat at  https://voce.chat.
+If you have a proposal on how multiple servers could get interconnected, e.g., should we support Matrix protocal, or other protocal, feel free to share your thougts in the discussions, or directly discuss it with at our chat at  https://voce.chat.
 
-# More on VoceChat
+# Open-source while requiring buying licenses.
 
-`Vocechat` is a secure community chat social media that supports independent deployment.
-The data is completely controlled by the user.
-The community version is open-sourced, for better supports and advanced features like personalized encryption and transmission or burned immediately after reading, please purchase our [entreprise version](https://voce.chat/).
-The function is inspired by products and specifications such as `Slack`, `Discord`, `RocketChat`, `Matrix` and `Solid`.
-The Vocechat server is the smallest, stablest and most efficient independent chat server on today's market.
+`VoceChat` is an open-source commercial software. The VoceChat server is the smallest, stablest and most efficient independent chat server on today's market, which is good for integration to your own app. To integrate VoceChat in your own app/site, you have to purchase a license. Once hosted, you can go to settings and see the license part.
 
-We believe that the way to live up to the true meaning of the decentralization ideal of Web 3.0 is through de-platformization.
-Through personalized computing and personalized storage, individuals and organizations can have their own platforms on their own cloud server.
-Therefore, Vocechat is created and positioned as a social collaboration program that can be easily deployed on the private cloud by any parties.
 
 The team is internationalized and cooperates remotely.
 The contributors come from North America, South America, Asia and Africa.
 
-VoceChat is an open-source product with a free community version and only charges for business usages. You are welcome to star, raise issues, and contribute in any form.
-
-We charge a license fee for commercial usages and we also provide resale license personalization services for NAS and cloud providers who want to collaborate with us (just like SynologyChat for their NAS). We also provide a free version for personal usages (servers with less than 20 members). 
+We also provide resale license for NAS and cloud providers who want to collaborate with us (if you want to provide something like SynologyChat).
 
 ### Project composition:
 
