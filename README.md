@@ -1,3 +1,6 @@
+
+# Re-decentralized the Internet through personal cloud computing.
+## VoceChat is the `lightest` chat server prioritizes private hosting!
 ### Quickly run
 
 ```bash
@@ -16,9 +19,6 @@ Doc: [https://doc.voce.chat](https://doc.voce.chat)
 Chat with us: [https://voce.chat](https://voce.chat)  
 Email: [han@privoce.com](han@privoce.com)
 ### Welcome your help of any form--code, issues, blog articles, social media shares.
-
-# Re-decentralized the Internet through personal cloud computing.
-## VoceChat is the `lightest` chat server prioritizes private hosting!
 
 # Goal
 
