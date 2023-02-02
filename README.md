@@ -46,11 +46,7 @@ If you have a proposal on how multiple servers could get interconnected, e.g., s
 
 `VoceChat` is an open-source commercial software. The VoceChat server is the smallest, stablest and most efficient independent chat server on today's market, which is good for integration to your own app. To integrate VoceChat in your own app/site, you have to purchase a license. Once hosted, you can go to settings and see the license part.
 
-
-The team is internationalized and cooperates remotely.
-The contributors come from North America, South America, Asia and Africa.
-
-We also provide resale license for NAS and cloud providers who want to collaborate with us (if you want to provide something like SynologyChat).
+Our team also provide customization service. We also provide resale license for NAS and cloud providers who want to collaborate with us (if you want to provide something like SynologyChat).
 
 ### Project composition:
 
@@ -76,6 +72,7 @@ We also provide resale license for NAS and cloud providers who want to collabora
 - [ ] Role based permission control/ Undecided
 - [ ] Post, based on ActivityPub/ Undecided
 - [ ] Matrix Bridge/ Undecided
+
 
 
 
