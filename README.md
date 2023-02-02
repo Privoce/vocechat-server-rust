@@ -13,7 +13,7 @@ docker run -d --restart=always \
 On browser visit: http://localhost:3009/
 
 
-### Contact Us
+### Contact us
 
 Doc: [https://doc.voce.chat](https://doc.voce.chat)  
 Chat with us: [https://voce.chat](https://voce.chat)  
@@ -28,7 +28,7 @@ Why do we need a private cloud space? The short answer is that information will 
 
 Digital technologies including Internet and the Web make information duplicable and transferable, yet platforms are controlling the ownership and means of production and transmission of most information (content) on the Internet. We are building Voce as an open-sourced tool (not a platform) to empower smaller groups and individuals to become a platform themselves. When various servers get connected to each other, all the information shared among the servers will be duplicated and become the server owner's private data under private storages.
 
-# Why Personal Cloud
+# Personal cloud
 
 We need a "home" as our private property on the Internet, and this home should have features more than just storage. No matter you choose NAS, AWS, Raspberry Pi or your local PC to run VoceChat, it is your own private property--yes, public cloud services like AWS purchased by you is commercially your own property and the data in your cloud is protected from accessing by the public cloud service providers. Features including but not limited to instant messaging, activity posts, private video calls, notes, whiteboard are all desiring and useful on your personal cloud server. Personal cloud is the new PC, and there will be a new software layer with some shared traits--distributed by URL(web app), good API, interoperable profiles. Privoce is currently working on this software layer of personal cloud.
 
@@ -36,9 +36,11 @@ We need a "home" as our private property on the Internet, and this home should h
 
 Personal cloud needs efficent solutions. This Rust written server is less than 20MB and runs with great efficiency. Hosting a 20MB private social media server is much more accessible than a 300MB one. Just like cars v. bus, or single family home v. hotels, if Facebook is a grand hotel, VoceChat is like a house. If Matrix and Mastodon are buses, VoceChat is like a car. The next paradigm of the internet is serverless functions + personal storage. Making VoceChat serverless is also a next step.
 
-# How to get interconnected (work in progress)
+# Webhook, bot, and ways to get interconnected (work in progress)
 
 Social media cannot always stay private if people want new information to be transferred among different servers. The word "social" in social media means multiple nodes communicate with multiple nodes in a synced space (mass to mass). A channel (private or public) should serve the end of this mass to mass data sharing and syncing space. Channel should function as a shared good where members who joined should have the right to store the same chat data (use their server)--this may one day functions like Bitcoin, yet currently, efficiency should be more prioritiezed and admin of the channel could have the right to assign different "power" to members. We have implemented both inbound and outbound webhooks so that it's possible to sync messages from a VoceChat channel to another channel (slack, discord, or VoceChat) though you will need to write your own server side code to personalize this process (this could be troublesome, and again, serverless could be a good solution). 
+
+We also found bot super interesting and personal bot services may replace platforms--e.g., we are training some bots based on GPT api that can be added to VoceChat.
 
 If you have a proposal on how multiple servers could get interconnected, e.g., should we support Matrix protocal, or other protocal, feel free to share your thougts in the discussions, or directly discuss it with at our chat at  https://voce.chat.
 
@@ -57,7 +59,7 @@ Our team also provide customization service. We also provide resale license for 
 | Web Client | React                               | [vocechat-web](https://github.com/privoce/vocechat-web)   | GPLv3     | Web App, integrated management                      |
 | Document   | [docusaurus](https://docusaurus.io) | [vocechat-doc](https://github.com/privoce/vocechat-doc)   | GPLv3     | Vocechat document website                           |
 
-### Feature List & Roadmap
+### Feature list & roadmap
 
 - [x] DM & Group Chating / 2021-Q4
 - [x] Reply, @ to mention a person / 2021-Q4
