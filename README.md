@@ -1,3 +1,21 @@
+### Quickly run
+
+```bash
+docker run -d --restart=always \
+  -p 3009:3000 \
+  --name vocechat-server \
+  Privoce/vocechat-server:latest
+```
+
+On browser visit: http://localhost:3009/
+
+
+### Contact Us
+
+Doc: [https://doc.voce.chat](https://doc.voce.chat)  
+Chat with us: [https://voce.chat](https://voce.chat)  
+Email: [han@privoce.com](han@privoce.com)
+### Welcome your help of any form--code, issues, blog articles, social media shares.
 
 # Re-decentralized the Internet through personal cloud computing.
 ## VoceChat is the `lightest` chat server prioritizes private hosting!
@@ -59,22 +77,5 @@ We also provide resale license for NAS and cloud providers who want to collabora
 - [ ] Post, based on ActivityPub/ Undecided
 - [ ] Matrix Bridge/ Undecided
 
-### Quickly run
 
-```bash
-docker run -d --restart=always \
-  -p 3009:3000 \
-  --name vocechat-server \
-  Privoce/vocechat-server:latest
-```
-
-On browser visit: http://localhost:3009/
-
-
-### Contact Us
-
-Doc: [https://doc.voce.chat](https://doc.voce.chat)  
-Chat with us: [https://voce.chat](https://voce.chat)  
-Email: [han@privoce.com](han@privoce.com)
-### Welcome your help of any form--code, issues, blog articles, social media shares.
 
