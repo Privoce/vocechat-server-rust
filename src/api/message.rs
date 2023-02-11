@@ -945,6 +945,10 @@ async fn send_notify(
         let fut = async move {
             if let Some(fcm_client) = state.get_dynamic_config_instance::<FcmConfig>().await {
                 for token in notify_tokens {
+                    if state.invalid_device_tokens.lock().contains(&token) {
+                        continue;
+                    }
+
                     if Instant::now() - notify_start_time > Duration::from_secs(60) {
                         break;
                     }
@@ -955,6 +959,13 @@ async fn send_notify(
                         "send notify"
                     );
                     if let Err(err) = fcm_client.send(&token, &title, &message, &data).await {
+                        if let Some(req_err) = err.downcast_ref::<reqwest::Error>() {
+                            if let Some(StatusCode::BAD_REQUEST) = req_err.status() {
+                                state.invalid_device_tokens.lock().insert(token);
+                                continue;
+                            }
+                        }
+
                         tracing::error!(
                             device_token = token.as_str(),
                             error = %err, "failed to send notify with firebase",

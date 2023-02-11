@@ -1,7 +1,7 @@
 use std::{
     any::Any,
     borrow::Cow,
-    collections::{BTreeMap, BTreeSet, HashMap},
+    collections::{BTreeMap, BTreeSet, HashMap, HashSet},
     path::{Path, PathBuf},
     sync::Arc,
     time::{Duration, SystemTime},
@@ -402,6 +402,7 @@ pub struct State {
     pub templates: Arc<Templates>,
     pub pending_oidc: Arc<Mutex<HashMap<String, OAuth2State>>>,
     pub msg_updated_channel: Arc<mpsc::UnboundedSender<i64>>,
+    pub invalid_device_tokens: Arc<parking_lot::Mutex<HashSet<String>>>,
 }
 
 impl State {

@@ -116,6 +116,7 @@ pub async fn create_state(config_path: &Path, config: Arc<Config>) -> Result<Sta
         templates: Arc::new(templates),
         pending_oidc: Default::default(),
         msg_updated_channel: Arc::new(msg_updated_tx),
+        invalid_device_tokens: Default::default(),
     };
 
     // load dynamic config
