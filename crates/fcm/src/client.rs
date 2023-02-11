@@ -105,6 +105,7 @@ impl FcmClient {
                     "notification": {
                         "title": title,
                         "body": message,
+                        "sound": "default",
                     },
                     "data": data,
                     "token": device_token,
