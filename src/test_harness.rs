@@ -64,6 +64,7 @@ impl TestServer {
             template: Default::default(),
             users: vec![],
             webclient_url: None,
+            offical_fcm_config: Default::default(),
         };
         f(&mut cfg);
         let state = crate::server::create_state(tempdir.path(), Arc::new(cfg))

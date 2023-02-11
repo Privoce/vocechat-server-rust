@@ -334,6 +334,7 @@ mod tests {
             template: Default::default(),
             users: vec![],
             webclient_url: None,
+            offical_fcm_config: Default::default(),
         };
         let state = create_state(tempdir.path(), Arc::new(config))
             .await

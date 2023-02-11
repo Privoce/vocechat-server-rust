@@ -1,4 +1,5 @@
 #![allow(clippy::large_enum_variant)]
+#![allow(clippy::uninlined_format_args)]
 
 mod api;
 mod api_key;
@@ -41,6 +42,11 @@ use crate::{
 #[derive(Debug, Default, Deserialize)]
 struct EnvironmentVars {
     data_dir: Option<PathBuf>,
+
+    fcm_project_id: String,
+    fcm_private_key: String,
+    fcm_client_email: String,
+    token_uri: String,
 }
 
 impl EnvironmentVars {
@@ -48,6 +54,12 @@ impl EnvironmentVars {
         if let Some(data_dir) = self.data_dir {
             config.system.data_dir = data_dir;
         }
+
+        config.offical_fcm_config.project_id = self.fcm_project_id;
+        config.offical_fcm_config.private_key = self.fcm_private_key;
+        config.offical_fcm_config.client_email = self.fcm_client_email;
+        config.offical_fcm_config.token_uri = self.token_uri;
+
         config
     }
 }

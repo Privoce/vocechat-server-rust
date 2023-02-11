@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::{tags::ApiTags, token::Token},
+    config::Config,
     state::{DynamicConfig, DynamicConfigEntry},
     State,
 };
@@ -23,7 +24,7 @@ impl DynamicConfig for GoogleAuthConfig {
         "google-auth"
     }
 
-    fn create_instance(self) -> Self::Instance {
+    fn create_instance(self, _config: &Config) -> Self::Instance {
         GoogleAuthConfig {
             client_id: String::new(),
         }

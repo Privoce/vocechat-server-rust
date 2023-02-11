@@ -1,7 +1,6 @@
 [system]
 server_key = "a secret key"
 data_dir = "./data"
-fcm_credentials = "fcm_credentials.json"
 
 [network]
 bind = "0.0.0.0:3000"

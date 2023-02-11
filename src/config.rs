@@ -6,6 +6,7 @@ use poem::listener::{
     acme::{AutoCert, ChallengeType},
     BoxListener, Listener, RustlsCertificate, RustlsConfig,
 };
+use rc_fcm::ApplicationCredentials;
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::api::LangId;
@@ -26,6 +27,8 @@ pub struct Config {
     #[serde(default, rename = "user")]
     pub users: Vec<UserConfig>,
     pub webclient_url: Option<String>,
+    #[serde(default)]
+    pub offical_fcm_config: ApplicationCredentials,
 }
 
 #[derive(Debug, Deserialize)]

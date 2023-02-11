@@ -382,7 +382,7 @@ pub trait DynamicConfig: Serialize + DeserializeOwned + Default {
 
     fn name() -> &'static str;
 
-    fn create_instance(self) -> Self::Instance;
+    fn create_instance(self, config: &Config) -> Self::Instance;
 }
 
 pub struct DynamicConfigEntry<T: DynamicConfig> {
@@ -1015,7 +1015,7 @@ impl State {
             .await?;
 
         if entry.enabled {
-            let instance = entry.config.create_instance();
+            let instance = entry.config.create_instance(&self.config);
             self.cache
                 .write()
                 .await
@@ -1046,7 +1046,7 @@ impl State {
     {
         let entry = self.load_dynamic_config_with::<T, _>(f).await?;
         if entry.enabled {
-            let instance = entry.config.create_instance();
+            let instance = entry.config.create_instance(&self.config);
             self.cache
                 .write()
                 .await

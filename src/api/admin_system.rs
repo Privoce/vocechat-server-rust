@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     api::{tags::ApiTags, token::Token, SmtpConfig, UserInfo},
+    config::Config,
     create_user::{CreateUser, CreateUserBy},
     server::create_random_str,
     state::{send_mail, DynamicConfig, DynamicConfigEntry},
@@ -37,7 +38,7 @@ impl DynamicConfig for FrontendUrlConfig {
         "frontend-url"
     }
 
-    fn create_instance(self) -> Self::Instance {
+    fn create_instance(self, _config: &Config) -> Self::Instance {
         self
     }
 }
@@ -56,7 +57,7 @@ impl DynamicConfig for OrganizationConfig {
         "organization"
     }
 
-    fn create_instance(self) -> Self::Instance {
+    fn create_instance(self, _config: &Config) -> Self::Instance {
         self
     }
 }
