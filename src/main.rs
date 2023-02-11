@@ -27,6 +27,7 @@ use poem::{
     listener::{Listener, TcpListener},
     EndpointExt, RouteScheme, Server,
 };
+use serde::Deserialize;
 use sqlx::SqlitePool;
 use tokio::runtime::Runtime;
 use tracing_subscriber::{fmt::Subscriber, util::SubscriberInitExt, EnvFilter};
@@ -36,6 +37,20 @@ use crate::{
     config::{Config, TlsConfig},
     state::State,
 };
+
+#[derive(Debug, Default, Deserialize)]
+struct EnvironmentVars {
+    data_dir: Option<PathBuf>,
+}
+
+impl EnvironmentVars {
+    fn merge_to_config(self, mut config: Config) -> Config {
+        if let Some(data_dir) = self.data_dir {
+            config.system.data_dir = data_dir;
+        }
+        config
+    }
+}
 
 #[derive(Debug, Parser)]
 #[clap(name = "vocechat", author, version, about)]
@@ -216,7 +231,10 @@ fn main() {
         );
         let config_path = options.config.clone();
         let config = Arc::new(match load_config(&config_path) {
-            Ok(config) => options.merge_to_config(config),
+            Ok(config) => envy::prefixed("VOCECHAT_")
+                .from_env::<EnvironmentVars>()
+                .unwrap_or_default()
+                .merge_to_config(options.merge_to_config(config)),
             Err(err) => {
                 tracing::error!(
                     path = %config_path.display(),
