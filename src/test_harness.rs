@@ -88,7 +88,7 @@ impl TestServer {
             })
             .await
             .unwrap();
-        let app = crate::server::create_endpoint(state.clone());
+        let app = crate::server::create_endpoint(state.clone()).await;
 
         state
             .create_user(

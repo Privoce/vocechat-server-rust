@@ -258,16 +258,27 @@ pub fn load_template(
     }
 }
 
-pub fn create_endpoint(state: State) -> impl Endpoint {
+pub async fn create_endpoint(state: State) -> impl Endpoint {
     let mut api_service = state.config.network.domain.iter().fold(
         api::create_api_service().server("http://localhost:3000/api"),
         |acc, domain| acc.server(format!("https://{}/api", domain)),
     );
-    if !state.config.network.frontend_url.is_empty() {
-        api_service = api_service.server(if state.config.network.frontend_url.ends_with('/') {
-            format!("{}api", state.config.network.frontend_url)
+    let frontend_url = state
+        .get_dynamic_config_instance::<FrontendUrlConfig>()
+        .await
+        .and_then(|config| config.url.clone())
+        .or_else(|| {
+            if !state.config.network.frontend_url.is_empty() {
+                Some(state.config.network.frontend_url.clone())
+            } else {
+                None
+            }
+        });
+    if let Some(frontend_url) = frontend_url {
+        api_service = api_service.server(if frontend_url.ends_with('/') {
+            format!("{}api", frontend_url)
         } else {
-            format!("{}/api", state.config.network.frontend_url)
+            format!("{}/api", frontend_url)
         });
     };
 
@@ -339,7 +350,7 @@ mod tests {
         let state = create_state(tempdir.path(), Arc::new(config))
             .await
             .unwrap();
-        let ep = create_endpoint(state);
+        let ep = create_endpoint(state).await;
         let acceptor = TcpListener::bind("127.0.0.1:0")
             .rustls(create_self_signed_config())
             .into_acceptor()

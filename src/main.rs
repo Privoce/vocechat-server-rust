@@ -287,10 +287,10 @@ fn main() {
 
         let app = match &config.network.tls {
             Some(TlsConfig::AcmeHttp01 { .. }) => RouteScheme::new()
-                .https(server::create_endpoint(state.clone()))
+                .https(server::create_endpoint(state.clone()).await)
                 .http(auto_cert.as_ref().unwrap().http_01_endpoint())
                 .boxed(),
-            _ => server::create_endpoint(state.clone())
+            _ => server::create_endpoint(state.clone()).await
                 .map_to_response()
                 .boxed(),
         };
