@@ -78,17 +78,21 @@ jobs:
           cd build/docker
           cp -rf ../../config ./
           docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
+          
           # build latest
           docker build -t vocechat-server:latest .
           docker tag vocechat-server:latest privoce/vocechat-server:latest
           docker push privoce/vocechat-server:latest
+          
           # build version
           docker build -t vocechat-server:${{ github.ref_name}} .
           docker tag vocechat-server:${{ github.ref_name}} privoce/vocechat-server:${{ github.ref_name}}
           docker push privoce/vocechat-server:${{ github.ref_name}}
+          
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 384878476649.dkr.ecr.us-east-1.amazonaws.com
           docker build --platform linux/amd64 -t 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-server:latest .
           docker push 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-server:latest
+          
           docker build --platform linux/amd64 -t 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-server:${{ github.ref_name}} .
           docker push 384878476649.dkr.ecr.us-east-1.amazonaws.com/vocechat-server:${{ github.ref_name}}
       - if: matrix.target == 'aarch64-unknown-linux-musl'
@@ -98,6 +102,7 @@ jobs:
           cd build/docker
           cp -rf ../../config ./
           docker login -u privoce -p ${{ secrets.DOCKER_PASSWORD }}
+          
           # build latest
           sudo apt install -y qemu-user-static binfmt-support
           sed -i "s/alpine/arm64v8\/alpine/ig" Dockerfile
@@ -105,11 +110,12 @@ jobs:
           docker buildx build -t vocechat-server:latest-arm64 --platform linux/arm64 .
           docker tag vocechat-server:latest-arm64 privoce/vocechat-server:latest-arm64
           docker push privoce/vocechat-server:latest-arm64
+          
           # build version
           docker buildx build -t vocechat-server:${{ github.ref_name}}-arm64 --platform linux/arm64 .
           docker tag vocechat-server:${{ github.ref_name}}-arm64 privoce/vocechat-server:${{ github.ref_name}}-arm64
           docker push privoce/vocechat-server:${{ github.ref_name}}-arm64
-      - name: rsync to s.voce.chat
+      - name: rsync to sh.voce.chat
         run: |
           rsync -av vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip root@${{ secrets.VOCECHAT_COM_HOST }}:/home/wwwroot/sh.voce.chat/vocechat-server-${{ github.ref_name}}-${{ matrix.target }}.zip
       - name: Upload Artifact

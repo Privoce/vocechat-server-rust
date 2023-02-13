@@ -3,19 +3,14 @@ RUN apk update && apk add ca-certificates
 
 FROM busybox
 COPY --from=certs /etc/ssl/certs /etc/ssl/certs
-
 COPY vocechat-server /home/vocechat-server/vocechat-server
 COPY config /home/vocechat-server/config
-# COPY wwwroot /home/vocechat-server/wwwroot
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
-
-#RUN vocechat -r -u 1000 -g vocechat
-#USER vocechat
-
+ENV VOCECHAT_FCM_PROJECT_ID="provice-firebase" \
+    VOCECHAT_FCM_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDKEOvCZPOv0qCl\nxypaTaROjEDlHwmRvvuzdGVcqJ30zngmOojMdiZr6mXnbROaVusIqU1jy/85SwYb\nUqEtCtYQwqy4DozpzQu+E7GjMToN+MVn701BMx5df0dUUzaZB6CrhFAKrzYXQZql\nJS7qZ/6USiKrOeC9z0rtVqlnxx4pQf25ShbVJ5nyVsVQekJtjCkJ6KNPbejRpfkC\nyquN3ntCv81yT6tX58PvESsJdxVvhWzAiAboQGOz56Bxw+CGmZhbykf1QsJU+u3u\nnjlDIpPOgfZhu3519whbeuk+4u1GKT/ifX3ZRy8VXcdo6N+SmG6NeSFrFRD+ubN/\ntwser7CbAgMBAAECggEABB4fJ8l1283ffzFVUBzH7d/WzLR6tfEd4PTMwfwfp+bz\nNNg5hG0d8FII/JPQ8/K0fGsyzAdSrqC0QadH6IqRfSryaRfG0Fbg1+E/2/L7W2CH\n6UvLl7oKct5Onk3JzYmFwSkDlowmfofUNmxRDe7LlcsC9NlLlqKcRMTg0+APYcjQ\nsp/1ylUsFx4zmwNLmJtsyCvkzgouUyk1ann5ir94xIVutO+1ZITkCt2gNt00ZfHv\ndB1YvQ+cBH/NO2gNeTGztI5eRE64eL9bx2hicnR2ucM2GtEQf6qiK2hna6ukIHjo\nxKx7dHmw4y4fH8I/kVS0GEiV2OFZhsbIWwDKPz96TQKBgQDufLNOmMg+Cqkp7+Be\nCnZcglGVNxdx6vS5yW1fI/K5z8wTFQ0WA8T6ejW7yoI2IKQiR9/Vw/TBGIFN/HQe\n87jMvTlgA795A4vmtsiOWCjdphGsGZBh2XyYEF4351Oe5sljOchpmdw79TA1dVpK\n1F795dn8aIUh8Qvmgci3ww3EVwKBgQDY54t9IjbU5pFiycLkgGjSQwcZ/hRDFGdW\nGGo74scj4ea+zFwcVF58ccIFPn4qtXcdajkKcDu1wUr2T+CyGHONXfPyc90J+J5e\nxMpKPeXWUXjYgmjGZyndc7xm8960O7amlkHZgNn2sla5jtlfcEBCXU7NUbEdIV0T\nGFsoH/lrXQKBgAdfX4OsgXQ5jCU5vyvpEuOlO7RrMZRZ+RrNOU5ZpCVOYTatzevC\nThKYOJUHm6Lku2473pWTKzvU8BpjFYvnaO0bZGytcPviui51tBmCbDD980nouGft\n+0YQK3l680DUTaF9pc5t7TsFR2o/qHzrt8wNkQGWkZcNBpsno/baVtCdAoGAQvbR\nOLO8a+Q3FGGn2rXOJsPsyFiJ1t/Qu2LUQWLVCj3u6A7djR17Aj54oPfXKcZWXO1z\naMaXmJhxVTP58eHcotNTwhGFN1PbSPTGYz9S2uTSQz2XrVEiOq1FiB9YLRqWXD3d\nXJIMOL58SdNRRsa4AAUglADZhl3Lh16one2pKj0CgYEA4cb6sy5sVjN8VSGRgCBj\n/THVYCnuxUtxQ1n2bBFAP0SHLj5a60DidT6+2jTBm1hxmVqFmdQUoxBgyQGijDuR\nwOqgDwChMaTgRvAkKnaZKVlnZ824AWscWuWiKuunH+vOLSRKF8HqbhH5ToWdrp3Z\nUUOcABjAOpQCiJONGjl+5Mo=\n-----END PRIVATE KEY-----\n" \
+    VOCECHAT_FCM_CLIENT_EMAIL="firebase-adminsdk-iw2br@provice-firebase.iam.gserviceaccount.com" \
+    VOCECHAT_FCM_TOKEN_URI="https://oauth2.googleapis.com/token"
 EXPOSE 3000
-
 WORKDIR /home/vocechat-server
 ENTRYPOINT ["/docker-entrypoint.sh"]
-# CMD ["/home/vocechat-server/vocechat-server", "/home/vocechat-server/config/config.toml"]
-# ENTRYPOINT ["/home/vocechat-server/vocechat-server", "/home/vocechat-server/config/config.toml"]
