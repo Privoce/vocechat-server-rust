@@ -1,0 +1,7 @@
+[system]
+server_key = "a secret key"
+data_dir = "./data"
+
+[network]
+bind = "0.0.0.0:3000"
+tls = true

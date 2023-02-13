@@ -1,0 +1,116 @@
+[package]
+name = "vocechat-server"
+version = "0.3.3"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+rc-msgdb = { path = "./crates/msgdb" }
+rc-token = { path = "./crates/token" }
+rc-fcm = { path = "./crates/fcm" }
+rc-magic-link = { path = "./crates/magic-link" }
+vc-license = { path = "./crates/vc-license" }
+agora-token = { path = "./crates/agora-token" }
+open-graph = { path = "./crates/open-graph", features = ["poem_openapi"] }
+
+poem = { version = "1.3.51", features = [
+    "rustls",
+    "sse",
+    "static-files",
+    "test",
+    "i18n",
+    "anyhow",
+    "acme",
+    'tokio-metrics',
+] }
+poem-openapi = { version = "2.0.23", features = [
+    "rapidoc",
+    "swagger-ui",
+    "redoc",
+    "chrono",
+    "email",
+    "static-files",
+] }
+serde = { version = "1.0.132", features = ["derive"] }
+tokio = { version = "1.17.0", features = [
+    "macros",
+    "rt-multi-thread",
+    "sync",
+    "fs",
+    "time",
+] }
+toml = "0.5.8"
+tracing = "0.1.29"
+tracing-subscriber = { version = "0.3.3", features = ["env-filter"] }
+serde_json = "1.0.73"
+parking_lot = "0.11.2"
+sqlx = { version = "0.5.9", features = [
+    "sqlite",
+    "runtime-tokio-rustls",
+    "chrono",
+    "json",
+] }
+itertools = "0.10.3"
+futures-util = "0.3.19"
+async-stream = "0.3.2"
+image = "0.24.2"
+uuid = { version = "0.8.2", features = ["v4"] }
+rcgen = { version = "0.8.14", features = ["x509-parser"] }
+tokio-stream = "0.1.8"
+num_enum = "0.5.5"
+unic-langid = "0.9.0"
+reqwest = { version = "0.11.8", default-features = false, features = [
+    "rustls-tls",
+    "json",
+] }
+lettre = { version = "0.10.0-rc.4", default-features = false, features = [
+    "smtp-transport",
+    "hostname",
+    "builder",
+    "tokio1",
+    "tokio1-rustls-tls",
+] }
+serde_urlencoded = "0.7.1"
+liquid = "0.23.1"
+fastrand = "1.7.0"
+fs2 = "0.4.3"
+hmac = "0.11.0"
+sha2 = "0.9.0"
+substring = "1.4.5"
+regex = "1.5.4"
+jsonwebtoken = "8.0.1"
+openidconnect = "2.4.0"
+#openidconnect = { git = "https://github.com/sunli829/openidconnect-rs", rev = "efd006c" }
+bytes = "1.1.0"
+textnonce = "1.0.0"
+web3 = { version = "0.18.0", default-features = false, features = ["signing"] }
+clap = { version = "3.1.6", features = ["derive"] }
+walkdir = "2.3.2"
+base64 = "0.13.0"
+zip = { version = "0.6.0", default-features = false, features = ["deflate"] }
+mime_guess = "2.0.4"
+url = "1.7.2"
+once_cell = "1.13.0"
+chrono = { version = "0.4.19", features = ["serde"] }
+anyhow = "1.0.51"
+hex = "0.4.3"
+envy = "0.4.2"
+
+[target.'cfg(not(windows))'.dependencies]
+daemonize = "0.4.1"
+
+[workspace]
+members = [
+    "crates/msgdb",
+    "crates/token",
+    "crates/fcm",
+    "crates/open-graph",
+    "crates/vc-license",
+]
+
+[dev-dependencies]
+reqwest = { version = "0.11.8", default-features = false, features = [
+    "rustls-tls",
+] }
+tempfile = "3.2.0"
+fnv = "1.0.7"
