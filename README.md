@@ -54,7 +54,7 @@ Our team also provide customization service. We also provide resale license for 
 
 | Name       | Tech                                | Project                                                   | License | Comment                                             |
 | ---------- | ----------------------------------- | --------------------------------------------------------- | ------- | --------------------------------------------------- |
-| Server     | Rust                                | [vocechat-server](https://github.com/privoce/vocechat-server-rust) | GPLv3   | Server supports Linux, Windows, Arm32/64 |
+| Server     | Rust                                | [vocechat-server](https://github.com/privoce/vocechat-server-rust) | Big Time Public License   | Server supports Linux, Windows, Arm32/64 |
 | Server image | Docker, Shell                             | [vocechat-docker](https://hub.docker.com/r/privoce/vocechat-server/tags) | Creative Commons Attribution-NonCommercial 4.0 International     | Official image supports Linux, AMD64           |
 | APP Client | Flutter                             | [vocechat-client](https://github.com/privoce/vocechat-client) | GPLv3     | Client supports Android and IOS platforms           |
 | Web Client | React                               | [vocechat-web](https://github.com/privoce/vocechat-web)   | GPLv3     | Web App, integrated management                      |
