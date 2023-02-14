@@ -1,6 +1,6 @@
 
 # Re-decentralized the Internet through personal cloud computing.
-## VoceChat is the `lightest` chat server prioritizes private hosting!
+## VoceChat is the `lightest` chat server prioritizes private hosting! Easy integratation to your app with our open API!
 ### Quick run
 
 ```bash
