@@ -46,7 +46,7 @@ If you have a proposal on how multiple servers could get interconnected, e.g., s
 
 # Free for personal use, require license for non-personal use.
 
-`VoceChat` is an open-source commercial software. The VoceChat server is the smallest, stablest and most efficient independent chat server on today's market, which is good for integration to your own app. VoceChat is free for personal use, which we define as equal or less than 20 registered users, if you want to integrate VoceChat to your own app/site for a larger user base, you have to purchase a license. The license is 49$/version.
+`VoceChat` is an open-source commercial software. The VoceChat server is the smallest, stablest and most efficient independent chat server on today's market, which is good for integration to your own app. VoceChat official image is free for personal use, which we define as equal or less than 20 registered users, if you want to integrate VoceChat to your own app/site for a larger user base, you have to purchase a license. The license is 49$/version.
 
 Our team also provide customization service. We also provide resale license for NAS and cloud providers who want to collaborate with us.
 
@@ -57,7 +57,7 @@ Our team also provide customization service. We also provide resale license for 
 | Server     | Rust                                | [vocechat-server](https://github.com/privoce/vocechat-server-rust) | Creative Commons Attribution-NonCommercial 4.0 International   | Server Supports platforms: Linux, Windows, Arm32/64 |
 | APP Client | Flutter                             | [vocechat-client](https://github.com/privoce/vocechat-client) | GPLv3     | Client supports Android and IOS platforms           |
 | Web Client | React                               | [vocechat-web](https://github.com/privoce/vocechat-web)   | GPLv3     | Web App, integrated management                      |
-| Document   | [docusaurus](https://docusaurus.io) | [vocechat-doc](https://github.com/privoce/vocechat-doc)   | GPLv3     | Vocechat document website                           |
+| Documentation   | [docusaurus](https://docusaurus.io) | [vocechat-doc](https://github.com/privoce/vocechat-doc)   | GPLv3     | Vocechat document website                           |
 
 ### Feature list & roadmap
 
