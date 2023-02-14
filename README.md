@@ -44,11 +44,11 @@ We also found bot super interesting and personal bot services may replace platfo
 
 If you have a proposal on how multiple servers could get interconnected, e.g., should we support Matrix protocal, or other protocal, feel free to share your thougts in the discussions, or directly discuss it with at our chat at  https://voce.chat.
 
-# Open-source while requiring buying licenses.
+# Free for personal use, require license for non-personal use.
 
-`VoceChat` is an open-source commercial software. The VoceChat server is the smallest, stablest and most efficient independent chat server on today's market, which is good for integration to your own app. To integrate VoceChat in your own app/site, you have to purchase a license. Once hosted, you can go to settings and see the license part.
+`VoceChat` is an open-source commercial software. The VoceChat server is the smallest, stablest and most efficient independent chat server on today's market, which is good for integration to your own app. VoceChat is free for personal use, which we define as equal or less than 20 registered users, if you want to integrate VoceChat to your own app/site for a larger user base, you have to purchase a license. The license is 49$/version.
 
-Our team also provide customization service. We also provide resale license for NAS and cloud providers who want to collaborate with us (if you want to provide something like SynologyChat).
+Our team also provide customization service. We also provide resale license for NAS and cloud providers who want to collaborate with us.
 
 ### Project composition:
 
@@ -76,5 +76,5 @@ Our team also provide customization service. We also provide resale license for 
 - [ ] Matrix Bridge/ Undecided
 
 
-
-
+Chat with us: https://voce.chat
+Email: han@privoce.com
