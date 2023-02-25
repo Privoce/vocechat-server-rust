@@ -129,7 +129,7 @@ impl ApiResource {
         Ok(req.create_response(path, false)?)
     }
 
-    /// Get user avatar by id
+    /// Get group avatar by id
     #[oai(path = "/group_avatar", method = "get")]
     async fn get_group_avatar(
         &self,
