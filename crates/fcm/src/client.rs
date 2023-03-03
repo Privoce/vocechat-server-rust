@@ -127,23 +127,22 @@ mod tests {
     #[tokio::test]
     async fn test_send() {
         let credentials = ApplicationCredentials {
-            project_id: "vocechat-develop".to_string(),
-            private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC99goqqoX4OyB6\ng0kOCGL7HG1cfWH0BDOjopghPl0Ja49/Fbegl+43XRpt7kSXfPawUj9bx++32CB7\nT6Z4GtW4HszZdyIpvdmNq12mGwentjH9jmEskkcJpnnQMyuoWkvbzxriF1ppdDy4\n/sTRMZbSVsRoyxoaviRL/5OfHR9dtfn/04L6tByREfj06LScQ/CMwrN2IrL/3WcX\nzGHJoAPazif8D/YGgjy5zFizvI54O8ZAryjpLpyk75hdj0GTJdPLp4AERJU9q5sw\nGSB8xeZnRcYpIHGBgEIqKYel756dY3099p2xCbXyU1hwk07fx+rQbsZYu8fNnOs9\nMaRPUrYTAgMBAAECggEACnGDX5MeaGY/w9yB4K6fWnTWolYWU4cDm8Rtnq5CCSmL\nqw3zmXWg2BRbRp3p0XZCTbFH4HDegfn01zKq0UGQbF3tHyuIikjws/Qu4tnrktHW\nb70rJHsqQqKPYd3eUZQdRYleTf3Ar7l/OSBwi5uxUgEJLUW1OrEnZ7I2WHIObmVh\nXdvUGgKGqnBMKuMxZ45vgcFpVvbxWv3JOa9bVLUf2yzoBTwZyL6jMMzB/iBqVGBA\nhVPV8EuA4WDzVzodYoR5/ZxvUZZ+LF4/we6QLqA15Nirj2C6vplLgbkYDoAgqls5\nFZg6CAU2I12qd4v9n5X7Rot9yQ5idwsCFx0rMY3HKQKBgQD4COAg0NgTmBv1J/6Y\ns4GEu0Ds/ubWQqhR4bB1xxHf0f7ZMQHH0WQD+0WjJswLoXyYVIt5TxSoMpFXiTaR\nWOtXeXfvqjJIdHFIL+EeuMyRGXdVRAxX+bHMxipQ5/3BiSl4AA0qH9JEpkvj6kKf\niQ016DqPnHvuX5PZfOnOllrd9QKBgQDED7vlDXcX5VpwbPgDssV4zquwabbCYi4I\nh9kz+yIsQVAcaEjeNssYdKLKF770m5cdCrzIrIsgyqBsKJTlnRJOIY5aIzuZGwyz\nMTjHxhPepKmtpAuix4mH3OJ0Fqzuc8yj6egOlb8j85VbkgGXkQUbnFZLlfC7Rf/k\n6J6jb//25wKBgGeIbOXFxywGpkTi+OcMptecwjErBXgSQuhK6LmA6vkeUt6eEjwy\nLylqTVsY6rtAIR4EzGNKmzjKQtjjMZ/iGfpdfa7QwER2NoMHWVTVlq5KjwFMckqW\ns5ziau9ypv2OH30zqEsZFVAKiksMkdq9/oGt+iPQEfsicjiqZ34QTMWxAoGASu5U\nekL+LBTMzsDmvMsbK4OZHHAamAnb3AjHW1V0hwNjMagtiTfZwPv6p1AR+/xm8YOE\nCRHgjmTCkPOljGfOcivi8tIaWfZ7kRSTxc4PE/1Ml/9lLw4hotopdgKgjvWU1WR0\n+vYCOiRDBd80Wo/jKt1CIdspSPmExiCdWItagSsCgYB6A1E4AbPeHszORLeVJAiO\nx4cSDaKSww/E93RZjF7QJXr2xlODTUb3kYd+TozL0P/kDmC57w3aLWkxpuAyLhqy\nQOVj7PCz2k38ZezkHZVN+soZc74/w483V1+2g4HPjbFADKThRxwlmyLqgoTPpTY5\ny8fMswj9GwiZmmS3IRqFuA==\n-----END PRIVATE KEY-----\n"
-            .to_string(),
-            client_email: "firebase-adminsdk-aj4n6@vocechat-develop.iam.gserviceaccount.com"
+            project_id: "Your project".to_string(),
+            private_key: "Your key".to_string(),
+            client_email: "Your client email"
                 .to_string(),
             token_uri: "https://oauth2.googleapis.com/token".to_string(),
         };
 
         let client = FcmClient::new(credentials);
-        let device_token = "cHzY7u91OEY3oCd-uP-Wbm:APA91bEsRUfrzehskdhdjCyFQkXkE23GBdqNNDJLvwWlV7TwpWVwDEhYSntZZ9CyLwqKBMUDjDUlvarlfzHLMjXVFyB1R0Wgm4rwWFTDD65ZBsR78KJLCfUPxyeaDcBSOVWvMQ03Opw5";
+        let device_token = "Your client token";
         client
             .send(
                 device_token,
                 "title",
                 "hello!",
                 &json!({
-                    "vocechat_server_id": "8WgMQwEnxnB0kceYhb2TYh5NZGDiwHyk",
+                    "vocechat_server_id": "your server id",
                     "vocechat_from_uid": "123",
                     "vocechat_to_uid": "123123",
                 }),
