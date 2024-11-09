@@ -5,12 +5,12 @@
 
 ```bash
 docker run -d --restart=always \
-  -p 3009:3000 \
+  -p 3000:3000 \
   --name vocechat-server \
   Privoce/vocechat-server:latest
 ```
 
-On browser visit: http://localhost:3009/
+On browser visit: http://localhost:3000/
 
 
 ### Contact us
