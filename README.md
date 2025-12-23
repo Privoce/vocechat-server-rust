@@ -7,7 +7,7 @@
 docker run -d --restart=always \
   -p 3009:3000 \
   --name vocechat-server \
-  Privoce/vocechat-server:latest
+  privoce/vocechat-server:latest
 ```
 
 On browser visit: http://localhost:3009/
