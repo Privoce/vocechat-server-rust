@@ -62,19 +62,19 @@ Our team also provide customization service. We also provide resale license for 
 
 ### Feature list & roadmap
 
-- [x] DM & Group Chating / 2021-Q4
-- [x] Reply, @ to mention a person / 2021-Q4
-- [x] Images and large files transmission / 2021-Q4
-- [x] Pin / 2022-Q1
-- [x] Forward / 2022-Q1
-- [x] Favorate / 2022-Q1
-- [x] Auto-delete my messages / 2022-Q2
-- [x] Voice (now support agora) / 2022-Q4
-- [x] Video (now support agora)/ 2022-Q4
-- [x] Bot and Webhook (inbound and outbound)/ 2022-Q4
-- [ ] Role based permission control/ Undecided
-- [ ] Post, based on ActivityPub/ Undecided
-- [ ] Matrix Bridge/ Undecided
+- [x] Voice (now support VoceSpace private hosting solution, also agora)
+- [x] Video (now support VoceSpace private hosting solution, also agora)
+- [x] DM & Group Chating 
+- [x] Reply, @ to mention a person 
+- [x] Images and large files transmission 
+- [x] Pin 
+- [x] Forward 
+- [x] Favorate 
+- [x] Auto-delete my messages 
+- [x] Bot and Webhook (inbound and outbound)
+- [ ] Role based permission control
+- [ ] Post, based on ActivityPub
+- [ ] Matrix Bridge
 
 
 Chat with us: https://voce.chat
